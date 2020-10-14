@@ -1,9 +1,9 @@
-const roleService = require('../services/role');
+const Role = require('../models/role');
 
 module.exports.getRoles = async (req, res, next) => {
     // let { page } = req.params;
-    let roles = await roleService.readRoles({}); // { limit: }
-    // let totalCount = await roleService.countAll({});
+    let roles = await Role.findAll(); // { limit: }
+    // let totalCount = await Role.countAll({});
 
     req.status = 200; 
     // req.data.paging = {
@@ -22,9 +22,7 @@ module.exports.getRoles = async (req, res, next) => {
 
 module.exports.getRole = async (req, res, next) => {
     let { id } = req.params;
-    let role = await roleService.readRole({
-        where: { id }
-    });
+    let role = await Role.findByPk(id);
 
     req.status = 200; 
     req.data = role;
@@ -34,8 +32,9 @@ module.exports.getRole = async (req, res, next) => {
 
 module.exports.createRole = async (req, res, next) => {
     let { department, accessLevel } = req.body;
-    let role = await roleService.createRole({ 
-        department, accessLevel
+    let role = await Role.create({ 
+        department, 
+        accessLevel
     }); 
     
     req.status = 201;
@@ -48,7 +47,7 @@ module.exports.createRole = async (req, res, next) => {
 module.exports.updateRole = async (req, res, next) => {
     let { id } = req.params;
     let { department, accessLevel } = req.body;
-    let role = await roleService.updateRole({
+    let role = await Role.update({
         department, accessLevel
     }, {
         where: {
@@ -65,8 +64,9 @@ module.exports.updateRole = async (req, res, next) => {
 
 module.exports.deleteRole = async (req, res, next) => {
     let { id } = req.params;
-    let role = await roleService.deleteRole(id);
+    let role = await Role.findByPk(id);
 
+    await role.destroy();
     req.status = 200; 
     req.data = role;
     req.error = null;

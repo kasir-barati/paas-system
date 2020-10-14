@@ -5,12 +5,12 @@ const jsonwebtoken = require('jsonwebtoken');
 
 const PRIVATE_KEY_PATH = path.join(__dirname, '..', '..', 'keys', 'id_rsa_private.pem');
 const PUBLIC_KEY_PATH = path.join(__dirname, '..', '..', 'keys', 'id_rsa_public.pem');
-const PRIVATE_KEY = fsPromises.readFile(PRIVATE_KEY_PATH);
-const PUBLIC_KEY = fsPromises.readFile(PUBLIC_KEY_PATH);
 
 module.exports.generateAccessToken = async (payload, expiresIn) => {
+    const privateKey = await fsPromises.readFile(PRIVATE_KEY_PATH);
     return new Promise((resolve, reject) => {
-        jsonwebtoken.sign(payload, PRIVATE_KEY, {
+        
+        jsonwebtoken.sign(payload, privateKey, {
             expiresIn, algorithm: 'RS256'
         }, (error, accessToken) => {
             if (error) reject(error);
@@ -20,8 +20,10 @@ module.exports.generateAccessToken = async (payload, expiresIn) => {
 };
 
 module.exports.generateRefreshToken = async (payload, expiresIn) => {
+    const privateKey = await fsPromises.readFile(PRIVATE_KEY_PATH);
     return new Promise((resolve, reject) => {
-        jsonwebtoken.sign(payload, PRIVATE_KEY, {
+
+        jsonwebtoken.sign(payload, privateKey, {
             expiresIn, algorithm: 'RS256'
         }, (error, refreshToken) => {
             if (error) reject(error);
@@ -31,8 +33,10 @@ module.exports.generateRefreshToken = async (payload, expiresIn) => {
 };
 
 module.exports.verifyToken = async token => {
+    const publicKey = await fsPromises.readFile(PUBLIC_KEY_PATH);
     return new Promise((resolve, reject) => {
-        jsonwebtoken.verify(token, PUBLIC_KEY, (error, decoded) => {
+
+        jsonwebtoken.verify(token, publicKey, (error, decoded) => {
             if (error) reject(error);
             else resolve(decoded);
         });

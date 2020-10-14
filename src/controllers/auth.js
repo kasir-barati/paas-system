@@ -4,7 +4,7 @@ const mail = require('../utils/mail');
 const Role = require('../models/role');
 const User = require('../models/user');
 const Token = require('../models/token');
-const userService = require('../services/user');
+const authService = require('../services/auth');
 const passwordUtil = require('../utils/password');
 
 const UI_EMAIL_VERIFICATION_URI = process.env.UI_EMAIL_VERIFICATION_URI;
@@ -20,7 +20,7 @@ module.exports.register = async (req, res, next) => {
     let { email, password } = req.body;
     let role = await Role.findOne({ where: { accessLevel: 4 } });
     let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
-    let user = await userService.createUser({ 
+    let user = await User.create({ 
         email,
         hashedPassword,
         roleId: role.id,
@@ -41,29 +41,30 @@ module.exports.register = async (req, res, next) => {
 };
 
 module.exports.login = async (req, res, next) => {
-    let { email, password } = req.body;
-    let user = await userService.readUser({
-        email
+    let { email } = req.body;
+    let user = await User.findOne({
+        where: { email }
     });
-    let { accessToken, refreshToken } = await authService.generateJwt(user._id);
+    let accessToken = await authService.generateAccessToken(user.id);
 
-    req.status = 200;
-    req.data = [{
-        accessToken, refreshToken
-    }];
-    req.error = null;
+    await new Token({
+        token: accessToken,
+        type: 'jwt',
+        userId: id
+    }).save();
+    req.apiStatus = 200;
+    req.apiData = accessToken;
+    req.apiError = null;
     next();
 };
 
 module.exports.logout = async (req, res, next) => {
-    let { accessToken, refreshToken } = req;
-    await authService.addToBlackListTokens([accessToken, refreshToken]);
+    let { accessToken } = req.body;
 
-    req.status = 200;
-    req.data = [{
-        accessToken, refreshToken
-    }];
-    req.error = null;
+    await Token.findOneAndDelete({ token: accessToken });
+    req.apiData = accessToken;
+    req.apiStatus = 200;
+    req.apiError = null;
     next();
 };
 

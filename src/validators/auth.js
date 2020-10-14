@@ -1,4 +1,5 @@
 const ErrorResponse = require('../utils/error-response');
+const passwordUtil = require('../utils/password');
 const validator = require('../utils/validator');
 const Token = require('../models/token');
 const User = require('../models/user');
@@ -19,7 +20,19 @@ module.exports.register = async (req, res, next) => {
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
 
-module.exports.login = async (req, res, next) => { };
+module.exports.login = async (req, res, next) => {
+    let errorMessage = [];
+    let { email, password } = req.body;
+    let user = await User.findOne({ where: { email } });
+
+    if (!user) {
+        errorMessage.push("Email/Password is wrong");
+    } else {
+        !await passwordUtil.compare(password, user.hashedPassword, user.saltPassword) ? errorMessage.push("Email/Password is wrong") : '';
+    };
+
+    errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
+};
 
 module.exports.emailVerification = async (req, res, next) => {
     let { token } = req.body;

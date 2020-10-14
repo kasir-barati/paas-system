@@ -1,8 +1,8 @@
-const userService = require('../services/user');
-const roleService = require('../services/role');
+const User = require('../models/user');
+const Role = require('../models/role');
 
 module.exports.getUsers = async (req, res, next) => {
-    let users = await userService.readUsers({});
+    let users = await User.findAll();
     
     req.status = 200; 
     req.data = users ? users : [];
@@ -12,9 +12,7 @@ module.exports.getUsers = async (req, res, next) => {
 
 module.exports.getUser = async (req, res, next) => {
     let { id } = req.params;
-    let user = await userService.readUser({
-        where: { id }
-    });
+    let user = await User.findByPk(id);
 
     req.status = 200; 
     req.data = user ? user : [];
@@ -24,7 +22,7 @@ module.exports.getUser = async (req, res, next) => {
 
 module.exports.createUser = async (req, res, next) => {
     let { email, password, roleId } = req.body;
-    let user = await userService.createUser({ 
+    let user = await User.create({ 
         email, password, roleId
     }); 
     
@@ -38,7 +36,7 @@ module.exports.createUser = async (req, res, next) => {
 module.exports.updateUser = async (req, res, next) => {
     let { id } = req.params;
     let { email, password } = req.body;
-    let user = await userService.updateUser({
+    let user = await User.update({
         email, password
     }, {
         where: {
@@ -55,8 +53,9 @@ module.exports.updateUser = async (req, res, next) => {
 
 module.exports.deleteUser = async (req, res, next) => {
     let { id } = req.params;
-    let user = await userService.deleteUser(id);
-
+    let user = await User.findByPk(id);
+    
+    await user.destroy();
     req.status = 200; 
     req.data = user ? user : [];
     req.error = null;
