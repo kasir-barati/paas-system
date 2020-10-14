@@ -4,6 +4,7 @@
   "description": "test passport features &amp; passport modules",
   "main": "src/app.js",
   "scripts": {
+    "test": "mocha",
     "start": "node src/app.js",
     "dev-start": "npm run seed-postgres; nodemon src/app.js",
     "seed-postgres": "node src/seeds/seed-postgres.js"
@@ -23,9 +24,11 @@
   },
   "homepage": "https://github.com/MJB-Khorasani/test-passport#readme",
   "dependencies": {
+    "chai": "^4.2.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "mocha": "^8.1.3",
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.9",
     "nodemailer": "^6.4.13",

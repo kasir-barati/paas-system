@@ -9,6 +9,7 @@ module.exports.register = async (req, res, next) => {
     !validator.isPassword(password) ? errorMessage = errorMessage.concat("Password isn't valid|") : '';
     
     errorMessage ? next(new ErrorResponse('ValidationError', errorMessage, 400)) : next();
+    return;
 };
 
 module.exports.login = async (req, res, next) => { };
