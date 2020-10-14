@@ -1,0 +1,13 @@
+FROM php:7.2.32-apache
+
+# RUN apt-get update -y
+RUN curl -L https://api.github.com/repos/OWNER/REPO_NAME/tarball > userProjectRepo.tar
+RUN tar xvf userProjectRepo.tar
+RUN find . -type d -name '*REPO_NAME*' 2> /dev/null | xargs -IDIR mv DIR userProjectFiles
+RUN shopt -s dotglob
+RUN mv -f userProjectFiles/* .
+RUN rm -rf userProjectRepo.tar
+RUN rmdir userProjectFiles
+
+# EXPOSE 80
+# CMD [ "/usr/sbin/apache2ctl", "-D", "FORGROUND" ]
