@@ -15,8 +15,11 @@ User.init({
     phone: DataTypes.STRING,
     avatar: DataTypes.STRING,
     balance: DataTypes.FLOAT,
+    emailVerfied: {
+        defaultValue: false,
+        type: DataTypes.BOOLEAN
+    },
     saltPassword: DataTypes.STRING,
-    emailVerfied: DataTypes.BOOLEAN,
     hashedPassword: DataTypes.STRING
 }, {
     paranoid: false,

@@ -53,6 +53,7 @@ module.exports = async (err, req, res, next) => {
             case 'ReferenceError':
                 error = new ErrorResponse('ProgramingExeption', `Some kind of mistake happened in backend, please report it to the admin.`, 500);
                 break;
+            case 'AssertionError':
             case 'MongoParseError':
             case 'MongoServerSelectionError':
             case 'SequelizeConnectionError':

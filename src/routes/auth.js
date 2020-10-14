@@ -16,10 +16,10 @@ router
     .route('/login')
     .post(asyncMiddlewareHandler(authValidator.login), asyncMiddlewareHandler(authController.login));
 
-// /api/v1/auth/email-verification/:token
+// /api/v1/auth/email-verification/
 router
     .route('/email-verification')
-    .get(asyncMiddlewareHandler(authValidator.emailVerification));
+    .get(asyncMiddlewareHandler(authValidator.emailVerification), asyncMiddlewareHandler(authController.emailVerification));
 
 router
     .route('/password-reset')
