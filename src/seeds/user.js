@@ -1,25 +1,25 @@
 module.exports = async (Role, User) => {
-    let superAdminRole = Role.findOne({
+    let superAdminRole = await Role.findOne({
         where: {
             accessLevel: 0
         }
     });
-    let adminRole = Role.findOne({
+    let adminRole = await Role.findOne({
         where: {
             accessLevel: 1
         }
     });
-    let technicalAdminRole = Role.findOne({
+    let technicalAdminRole = await Role.findOne({
         where: {
             accessLevel: 2
         }
     });
-    let sellerAdminRole = Role.findOne({
+    let sellerAdminRole = await Role.findOne({
         where: {
             accessLevel: 3
         }
     });
-    let userRole = Role.findOne({
+    let userRole = await Role.findOne({
         where: {
             accessLevel: 4
         }
