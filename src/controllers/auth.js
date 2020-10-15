@@ -36,7 +36,7 @@ module.exports.register = async (req, res, next) => {
     }).save();
     await mail.sendMail(TALASHNET_EMAIL, email, 'Email verification - Talashnet', `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token}" >this link</a></h1>`);
     req.apiStatus = 201;
-    req.apiData = user;
+    req.apiData = null;
     req.apiError = null;
     next();
 };
