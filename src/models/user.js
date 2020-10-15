@@ -15,7 +15,7 @@ User.init({
     phone: DataTypes.STRING,
     avatar: DataTypes.STRING,
     balance: DataTypes.FLOAT,
-    emailVerfied: {
+    emailVerified: {
         defaultValue: false,
         type: DataTypes.BOOLEAN
     },

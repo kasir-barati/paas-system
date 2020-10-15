@@ -34,14 +34,13 @@ module.exports = async (err, req, res, next) => {
         } else {
             logger.error('Server side error occured.', {
                 meta: {
-                    "method": req.method ? req.method : null,
-                    "originalUrl": req.originalUrl ? req.originalUrl : null,
                     "ip": req.ip ? req.ip : null,
                     "userAgent": req.get('user-agent'),
+                    "method": req.method ? req.method : null,
+                    "originalUrl": req.originalUrl ? req.originalUrl : null,
                     "errorName": error.name,
-                    "errorMessage": error.message,
-                    "errorMessages": error.messages,
                     "errorStack": error.stack,
+                    "errorMessage": error.message,
                 }
             });
         };
