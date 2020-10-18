@@ -1,10 +1,10 @@
 const express = require('express');
 
-const profileController = require('../controllers/profile');
-const profileValidator = require('../validators/profile');
-const { asyncMiddlewareHandler } = require('../utils/promise');
+const profileController = require('../../controllers/client/profile');
+const profileValidator = require('../../validators/profile');
+const { asyncMiddlewareHandler } = require('../../utils/promise');
 
-// base URL: /api/v1/user/
+// base URL: /client/api/v1/user/
 const router = express.Router();
 
 router
