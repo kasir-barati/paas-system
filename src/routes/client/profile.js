@@ -10,8 +10,9 @@ const router = express.Router();
 
 router
     .route('/:id')
-    .get(asyncMiddlewareHandler(isUser), asyncMiddlewareHandler(profileController.getProfile))
-    .put(asyncMiddlewareHandler(isUser), asyncMiddlewareHandler(profileValidator.putProfile), asyncMiddlewareHandler(profileController.putProfile))
-    .delete(asyncMiddlewareHandler(isUser), asyncMiddlewareHandler(profileValidator.deleteProfile), asyncMiddlewareHandler(profileController.deleteProfile));
+    .all(asyncMiddlewareHandler(isUser))
+    .get(asyncMiddlewareHandler(profileController.getProfile))
+    .put(asyncMiddlewareHandler(profileValidator.putProfile), asyncMiddlewareHandler(profileController.putProfile))
+    .delete(asyncMiddlewareHandler(profileValidator.deleteProfile), asyncMiddlewareHandler(profileController.deleteProfile));
 
 module.exports = router;
