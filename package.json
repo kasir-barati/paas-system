@@ -33,7 +33,8 @@
     "pg": "^8.4.1",
     "sequelize": "^6.3.5",
     "winston": "^3.3.3",
-    "winston-mongodb": "^5.0.5"
+    "winston-mongodb": "^5.0.5",
+    "zarinpal-checkout": "^0.2.7"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
