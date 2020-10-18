@@ -11,6 +11,6 @@ const sequelize = require('../configs/sequelize');
 
 (async function() {
     await sequelize.getSequelize().sync({ force: true });
-    require('./role')(Role);
-    require('./user')(Role, User);
+    await require('./role')(Role);
+    await require('./user')(Role, User);
 })();
