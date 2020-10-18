@@ -1,4 +1,6 @@
 const httpStatus = require('../utils/http-status');
+const Logger = require('../utils/logger');
+const logger = new Logger('page-not-found');
 
 module.exports = (req, res, next) => {
     logger.warn('PageNotFound', {
@@ -9,9 +11,8 @@ module.exports = (req, res, next) => {
             "userAgent": req.get('user-agent'),
         }
     });
-    res.json({
-        apiStatus: httpStatus.notFound,
-        apiData: null,
-        apiError: "Page not found"
-    });
+    req.apiStatus = 404;
+    req.apiData = null;
+    req.apiError = "Page not found";
+    next();
 };

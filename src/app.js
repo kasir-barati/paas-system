@@ -30,8 +30,8 @@ app.use('/client/api/v1/auth', require('./routes/client/auth'));
 app.use('/client/api/v1/profiles', require('./routes/client/profile'));
 app.use('/client/api/v1/users', require('./routes/user'));
 app.use('/client/api/v1/roles', require('./routes/role'));
-app.use(require('./middlewares/send-response'));
 app.use(require('./middlewares/endpoint-not-found'));
+app.use(require('./middlewares/send-response'));
 app.use(require('./middlewares/express-error-handler'));
 
 app.listen(APP_PORT, APP_HOST, error => {
