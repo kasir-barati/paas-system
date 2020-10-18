@@ -21,14 +21,13 @@ module.exports = async (err, req, res, next) => {
         if (error.statusCode >= 400 && error.statusCode <= 422) {
             logger.warn('Validation error occured.', {
                 meta: {
-                    "method": req.method ? req.method : null,
-                    "originalUrl": req.originalUrl ? req.originalUrl : null,
                     "ip": req.ip ? req.ip : null,
                     "userAgent": req.get('user-agent'),
+                    "method": req.method ? req.method : null,
+                    "originalUrl": req.originalUrl ? req.originalUrl : null,
                     "errorName": error.name,
-                    "errorMessage": error.message,
-                    "errorMessages": error.messages,
                     "errorStack": error.stack,
+                    "errorMessage": error.message,
                 }
             });
         } else {
@@ -60,20 +59,28 @@ module.exports = async (err, req, res, next) => {
                 error = new ErrorResponse('DatabaseError', `Some kind of mistake happened in backend, please report it to the admin.`, 500);
                 await mail.sendMail('admin <ADMIN@GMAIL.COM>', 'node.js.developers.kh@gmail.com', 'Your database goes down', '<h1>please go there</h1>');
                 break;
+            case 'jwtError':
             case 'TokenExpiredError': 
-                error = new ErrorResponse('jwtError', `JWT token expired.`, 401);
-                break;
             case 'JsonWebTokenError': 
-                error = new ErrorResponse('jwtError', `JWT token is unvalided`, 401);
-                break;
             case 'NotBeforeError': 
-                error = new ErrorResponse('jwtError', `JWT token isn't activated`, 401);
+                error = new ErrorResponse('jwtError', `JWT error occured.`, 401);
                 break;
+            case 'Unauthorized':
+                error = new ErrorResponse('Unauthorized', `JWT error occured.`, 403);
         };
-        res.json({
-            apiStatus: httpStatus[error.statusCode],
-            apiData: null,
-            apiError: NODE_ENV === 'developement' ? err.message : error.message
-        });
+
+        if (error.statusCode === 401) {
+            res.status(401).json({
+                apiStatus: httpStatus[error.statusCode],
+                apiData: null,
+                apiError: NODE_ENV === 'developement' ? err.message : error.message
+            });
+        } else {
+            res.status(200).json({
+                apiStatus: httpStatus[error.statusCode],
+                apiData: null,
+                apiError: NODE_ENV === 'developement' ? err.message : error.message
+            });
+        };
     };
 };
