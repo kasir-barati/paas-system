@@ -1,10 +1,10 @@
 const express = require('express');
 
 const authController = require('../../controllers/client/auth');
-const authValidator = require('../../validators/auth');
+const authValidator = require('../../validators/client/auth');
 const { asyncMiddlewareHandler } = require('../../utils/promise');
 
-// base URL: /client/api/v1/user/
+// base URL: /client/api/v1/auth/
 const router = express.Router();
 
 router

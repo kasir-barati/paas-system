@@ -1,8 +1,8 @@
-const ErrorResponse = require('../utils/error-response');
-const passwordUtil = require('../utils/password');
-const validator = require('../utils/validator');
-const Token = require('../models/token');
-const User = require('../models/user');
+const ErrorResponse = require('../../utils/error-response');
+const passwordUtil = require('../../utils/password');
+const validator = require('../../utils/validator');
+const Token = require('../../models/token');
+const User = require('../../models/user');
 
 module.exports.register = async (req, res, next) => {
     let { email, password } = req.body;
