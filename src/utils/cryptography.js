@@ -12,13 +12,13 @@ const generateKeyPair = util.promisify(crypto.generateKeyPair);
             type: 'pkcs1',
             format: 'pem'
         },
-        publickKeyEncoding: {
+        publicKeyEncoding: {
             type: 'pkcs1',
             format: 'pem'
         },
         modulusLength: 4096
     });
-    
-    await fsPromises.writeFile(path.join(__dirname, 'keys', 'id_rsa_public.pem'), keyPair.publickKey);
-    await fsPromises.writeFile(path.join(__dirname, 'keys', 'id_rsa_private.pem'), keyPair.privateKey);
+    console.log(keyPair.publicKey);
+    await fsPromises.writeFile(path.join(__dirname, '..', '..', 'keys', 'id_rsa_public.pem'), keyPair.publicKey);
+    await fsPromises.writeFile(path.join(__dirname, '..', '..', 'keys', 'id_rsa_private.pem'), keyPair.privateKey);
 })();
