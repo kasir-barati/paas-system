@@ -20,12 +20,8 @@ UserPaymentModel.init({
         type: DataTypes.STRING
     },
     status: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true,
-            notNull: true
-        }
+        defaultValue: false,
+        type: DataTypes.BOOLEAN
     },
 }, {
     sequelize,
