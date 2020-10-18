@@ -29,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/users', require('./routes/user'));
 app.use('/api/v1/roles', require('./routes/role'));
+app.use('/api/v1/profiles', require('./routes/profile'));
 app.use(require('./middlewares/send-response'));
 app.use(require('./middlewares/endpoint-not-found'));
 app.use(require('./middlewares/express-error-handler'));

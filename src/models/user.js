@@ -20,7 +20,11 @@ User.init({
         type: DataTypes.BOOLEAN
     },
     saltPassword: DataTypes.STRING,
-    hashedPassword: DataTypes.STRING
+    hashedPassword: DataTypes.STRING,
+    isDeleted: {
+        defaultValue: false,
+        type: DataTypes.BOOLEAN
+    }
 }, {
     paranoid: false,
     modelName: 'users',

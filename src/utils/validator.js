@@ -14,10 +14,14 @@ module.exports.isSmallerThan = (str, length) => str.length < length;
 
 module.exports.isGreaterThan = (str, length) => str.length > length;
     
+module.exports.isAlpha = str => /[a-zA-Z\u0600-\u06FF\s]+/.test(str);
+
 module.exports.isAlphanumeric = str => /[a-zA-Z0-9\s]+/.test(str);
     
 module.exports.isIranianPhoneNumber = str => /(0|\+98)?([ ]|,|-|[()]){0,2}9[0|1|2|3|4]([ ]|,|-|[()]){0,2}(?:[0-9]([ ]|,|-|[()]){0,2}){8}/.test(this.val);
 
 module.exports.isNumeric = num => !isNaN(parseFloat(num)) && isFinite(num);
+
+module.exports.isUrl = url => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(url);
 
 module.exports.compare = (str1, str2) => str1.localeCompare(str2);
