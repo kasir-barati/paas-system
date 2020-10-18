@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../../models/user');
 
 module.exports.getProfile = async (req, res, next) => {
     let { id } = req.body;

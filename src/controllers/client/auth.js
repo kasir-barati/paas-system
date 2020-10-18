@@ -1,11 +1,11 @@
 const crypto = require('crypto');
 
-const mail = require('../utils/mail');
-const Role = require('../models/role');
-const User = require('../models/user');
-const Token = require('../models/token');
-const authService = require('../services/auth');
-const passwordUtil = require('../utils/password');
+const mail = require('../../utils/mail');
+const Role = require('../../models/role');
+const User = require('../../models/user');
+const Token = require('../../models/token');
+const authService = require('../../services/auth');
+const passwordUtil = require('../../utils/password');
 
 const UI_EMAIL_VERIFICATION_URI = process.env.UI_EMAIL_VERIFICATION_URI;
 const UI_PASSWORD_RESET_URI = process.env.UI_PASSWORD_RESET_URI;
