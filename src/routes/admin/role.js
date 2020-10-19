@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
-const roleController = require('../controllers/role');
-const { asyncMiddlewareHandler } = require('../utils/promise');
+const roleController = require('../../controllers/role');
+const { asyncMiddlewareHandler } = require('../../utils/promise');
 
 router
     .route('/')
