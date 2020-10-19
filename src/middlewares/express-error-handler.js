@@ -68,6 +68,9 @@ module.exports = async (err, req, res, next) => {
             case 'Unauthorized':
                 error = new ErrorResponse('Unauthorized', `JWT error occured.`, 403);
                 break;
+            case 'PaymentFailed': 
+                error.message = `Payment failed. please retry again.`;
+                break;
         };
 
         if (error.statusCode === 401) {

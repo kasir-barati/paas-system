@@ -22,7 +22,8 @@
     "sequelize": "^6.3.5",
     "winston": "^3.3.3",
     "winston-mongodb": "^5.0.5",
-    "zarinpal-checkout": "^0.2.7"
+    "zarinpal-checkout": "^0.2.7",
+    "zarinpal-gateway": "^0.1.6"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",

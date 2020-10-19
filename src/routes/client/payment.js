@@ -2,8 +2,8 @@ const router = require('express').Router();
 
 const { isUser } = require('../../middlewares/jwt');
 const { asyncMiddlewareHandler } = require('../../utils/promise');
-const paymentController = require('../../controllers/client/payment.js');
 const paymentValidator = require('../../validators/client/payment');
+const paymentController = require('../../controllers/client/payment.js');
 
 // /client/api/v1/payments
 router
