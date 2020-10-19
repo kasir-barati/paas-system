@@ -67,6 +67,7 @@ module.exports = async (err, req, res, next) => {
                 break;
             case 'Unauthorized':
                 error = new ErrorResponse('Unauthorized', `JWT error occured.`, 403);
+                break;
         };
 
         if (error.statusCode === 401) {
