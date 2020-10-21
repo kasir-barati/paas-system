@@ -6,15 +6,18 @@ const User = require('../../models/user');
 
 module.exports.register = async (req, res, next) => {
     let { email, password } = req.body;
-    let user = await User.findOne({
-        where: {
-            email
-        }
-    });
     let errorMessage = [];
 
-    user ? errorMessage.push("Email is duplicated") : '';
-    !validator.isEmail(email) ? errorMessage.push("Email isn't valid") : '';
+    if (!validator.isEmail(email)) {
+        errorMessage.push("Email isn't valid");
+    } else {
+        let user = await User.findOne({
+            where: {
+                email
+            }
+        });
+        user ? errorMessage.push("Email is duplicated") : '';
+    };
     !validator.isPassword(password) ? errorMessage.push("Password isn't valid") : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
