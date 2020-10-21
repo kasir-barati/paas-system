@@ -38,7 +38,7 @@ module.exports.login = async (req, res, next) => {
 module.exports.emailVerification = async (req, res, next) => {
     let { token } = req.body;
     let errorMessage = [];
-
+    
     !await Token.findOne({ token }) ? errorMessage.push('Token does not exist') : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
@@ -47,7 +47,7 @@ module.exports.resendEmailVerification = async (req, res, next) => {
     let { email } = req.body;
     let errorMessage = [];
     
-    !await User.findOne({ where: { email } }) ? errorMessage.push('Email is wrong') : '';
+    !await User.findOne({ where: { email } }) ? errorMessage.push('Email is wrong.') : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
 

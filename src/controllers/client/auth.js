@@ -61,7 +61,7 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.emailVerification = async (req, res, next) => {
     let { token } = req.body;
-    let t = await Token.findOneAndDelete({ token: { token } });
+    let t = await Token.findOneAndDelete({ token });
 
     await User.update({
         emailVerified: true
@@ -90,7 +90,7 @@ module.exports.resendEmailVerification = async (req, res, next) => {
         token,
         userId: user.id,
         type: 'email-verification'
-    });
+    }).save();
     req.apiData = null;
     req.apiError = null;
     req.apiStatus = 200;
