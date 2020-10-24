@@ -1,9 +1,8 @@
 module.exports = {
-    401: 'authenticationFailed',
-    200: 'Success',
-    201: 'Success',
-    403: 'forbidden',
-    404: 'notFound',
-    500: 'serverError',
-    400: 'badRequest'
+    'authenticationFailed': 401,
+    'success': 200,
+    'forbidden': 403,
+    'notFound': 404,
+    'serverError': 500,
+    'badRequest': 400
 };

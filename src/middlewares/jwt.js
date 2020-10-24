@@ -1,6 +1,7 @@
 const jwt = require('../utils/jwt');
 const User = require('../models/user')
 const Role = require('../models/role');
+const Token = require('../models/token');
 const ErrorResponse = require('../utils/error-response');
 
 module.exports.isUser = async (req, res, next) => {
@@ -17,6 +18,8 @@ module.exports.isUser = async (req, res, next) => {
     let role = await Role.findByPk(user.roleId);
 
     if (role.accessLevel !== 4) return next(new ErrorResponse('Unauthorized', 'You are not authorized.', 401));
+
+    if (!await Token.findOne({ token })) return next(new ErrorResponse('Unauthorized', 'You are not authorized.', 401))
 
     req.userId = decoded.sub;
     next();

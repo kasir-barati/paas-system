@@ -9,7 +9,7 @@ const router = express.Router();
 
 router
     .route('/register')
-    .post(asyncMiddlewareHandler(authValidator.register), asyncMiddlewareHandler(authController.register));
+    .post(asyncMiddlewareHandler(authValidator.register), authController.register);
 
 router
     .route('/login')

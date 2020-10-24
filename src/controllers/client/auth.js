@@ -1,4 +1,10 @@
+// const path = require('path');
 const crypto = require('crypto');
+// const { promises: fsPromises } = require('fs');
+
+// const axios = require('axios').default.create({
+//     baseURL: process.env.DOCKER_API_URI
+// });
 
 const mail = require('../../utils/mail');
 const Role = require('../../models/role');
@@ -6,6 +12,7 @@ const User = require('../../models/user');
 const Token = require('../../models/token');
 const authService = require('../../services/auth');
 const passwordUtil = require('../../utils/password');
+const dockerService = require('../../services/docker');
 
 const UI_EMAIL_VERIFICATION_URI = process.env.UI_EMAIL_VERIFICATION_URI;
 const UI_PASSWORD_RESET_URI = process.env.UI_PASSWORD_RESET_URI;
@@ -18,27 +25,51 @@ const TALASHNET_EMAIL = process.env.TALASHNET_EMAIL;
  * @next        Call next middleware to send back response
  */
 module.exports.register = async (req, res, next) => {
-    let { email, password } = req.body;
-    let role = await Role.findOne({ where: { accessLevel: 4 } });
-    let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
-    let user = await User.create({ 
-        email,
-        hashedPassword,
-        roleId: role.id,
-        saltPassword: salt
-    });
-    let token = crypto.randomBytes(32).toString('hex');
+    let stage, user, token;
+    try {
+        let { email, password } = req.body;
+        let role = await Role.findOne({ where: { accessLevel: 4 } });
+        let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
+        // let jsonPath = path.join(__dirname, '..', '..', '..', 'docker', 'json', 'network.json');
+        // let json = await fsPromises.readFile(jsonPath, 'utf8');
+        // json = dockerService.replaceJsonDataForNetwork(json, {
+        //     networkName: email.split('@')[0]
+        // });
+        // let response = await axios.post('/networks/create', JSON.parse(json));
+        // if (response.status !== 201) return next(new ErrorResponse('DockerError', 'Docker could not create network.', response.status));
 
-    await new Token({
-        token,
-        userId: user.id,
-        type: 'email-verification'
-    }).save();
-    await mail.sendMail(TALASHNET_EMAIL, email, 'Email verification - Talashnet', `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token}" >this link</a></h1>`);
-    req.apiStatus = 201;
-    req.apiData = null;
-    req.apiError = null;
-    next();
+        user = await User.create({
+            email,
+            hashedPassword,
+            roleId: role.id,
+            saltPassword: salt
+        });
+        stage = '0st';
+
+        token = await new Token({
+            userId: user.id,
+            type: 'email-verification',
+            token: crypto.randomBytes(32).toString('hex')
+        }).save();
+        stage = '1st';
+        
+        await mail.sendMail(TALASHNET_EMAIL, email, 'Email verification - Talashnet', `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token.token}" >this link</a></h1>`);
+        stage = '2st';
+
+        req.apiStatus = 200;
+        req.apiData = null;
+        req.apiError = null;
+        next();
+    } catch(error) {
+        switch (stage) {
+            case '2st': 
+                await token.remove();
+            case '1st': 
+                await user.destroy({ force: true });
+                break;
+        };
+        next(error);
+    };
 };
 
 module.exports.login = async (req, res, next) => {
@@ -73,7 +104,7 @@ module.exports.emailVerification = async (req, res, next) => {
 
     req.apiData = null;
     req.apiError = null;
-    req.apiStatus = 200;
+    req.apiStatus = httpStatus.success;
     next();
 };
 

@@ -10,42 +10,22 @@ module.exports = async (err, req, res, next) => {
     if (res.headersSent) {
         return next(err);
     } else {
-        let error = { 
-            name: err.name,
-            stack: err.stack,
-            message: err.message,
-            messages: err.messages,
-            statusCode: err.statusCode
-        };
-
-        if (error.statusCode >= 400 && error.statusCode <= 422) {
-            logger.warn('Validation error occured.', {
-                meta: {
-                    "ip": req.ip ? req.ip : null,
-                    "userAgent": req.get('user-agent'),
-                    "method": req.method ? req.method : null,
-                    "originalUrl": req.originalUrl ? req.originalUrl : null,
-                    "errorName": error.name,
-                    "errorStack": error.stack,
-                    "errorMessage": error.message,
-                }
-            });
-        } else {
-            logger.error('Server side error occured.', {
-                meta: {
-                    "ip": req.ip ? req.ip : null,
-                    "userAgent": req.get('user-agent'),
-                    "method": req.method ? req.method : null,
-                    "originalUrl": req.originalUrl ? req.originalUrl : null,
-                    "errorName": error.name,
-                    "errorStack": error.stack,
-                    "errorMessage": error.message,
-                }
-            });
+        let error;
+        let meta = {
+            "ip": req.ip ? req.ip : null,
+            "userAgent": req.get('user-agent'),
+            "method": req.method ? req.method : null,
+            "originalUrl": req.originalUrl ? req.originalUrl : null,
+            "errorName": err.name,
+            "errorStack": err.stack,
+            "errorMessage": err.message,
         };
 
         // if error thrown because of database goes down you must send email to the admin
         switch (err.name) {
+            case 'DockerError':
+                error = new ErrorResponse('DockerError', 'Docker could not handle request correctly', 500);;
+                break;
             case 'Error':
             case 'TypeError':
             case 'ReferenceError':
@@ -53,9 +33,19 @@ module.exports = async (err, req, res, next) => {
                 break;
             case 'AssertionError':
             case 'MongoParseError':
-            case 'MongoServerSelectionError':
+            case 'SequelizeDatabaseError':
             case 'SequelizeConnectionError':
+            case 'MongoServerSelectionError':
+            case 'SequelizeUniqueConstraintError':
             case 'SequelizeConnectionRefusedError':
+                meta.sequelizeErrors = [];
+                for (let item of err.errors) {
+                    meta.sequelizeErrors.push({
+                        type: item.type,
+                        value: item.value,
+                        message: item.message
+                    });
+                };
                 error = new ErrorResponse('DatabaseError', `Some kind of mistake happened in backend, please report it to the admin.`, 500);
                 await mail.sendMail('admin <ADMIN@GMAIL.COM>', 'node.js.developers.kh@gmail.com', 'Your database goes down', '<h1>please go there</h1>');
                 break;
@@ -71,20 +61,21 @@ module.exports = async (err, req, res, next) => {
             case 'PaymentFailed': 
                 error.message = `Payment failed. please retry again.`;
                 break;
+            case 'SyntaxError': 
+                error = new ErrorResponse('badRequest', `Something sent wrong.`, 400);
+                break;
         };
 
-        if (error.statusCode === 401) {
-            res.status(401).json({
-                apiStatus: httpStatus[error.statusCode],
-                apiData: null,
-                apiError: NODE_ENV === 'developement' ? err.message : error.message
-            });
+        if (err.statusCode >= 400 && err.statusCode <= 422) {
+            logger.warn('Validation error occured.', { meta });
         } else {
-            res.status(200).json({
-                apiStatus: httpStatus[error.statusCode],
-                apiData: null,
-                apiError: NODE_ENV === 'developement' ? err.message : error.message
-            });
+            logger.error('Server side error occured.', { meta });
         };
+
+        res.status(err.statusCode === 401 ? 401 : 200).json({
+            apiData: null,
+            apiStatus: error.statusCode,
+            apiError: NODE_ENV === 'developement' ? err.message : error.message
+        });
     };
 };

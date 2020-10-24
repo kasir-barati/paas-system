@@ -19,24 +19,26 @@ const APP_PORT = process.env.APP_PORT;
 const APP_HOST = process.env.APP_HOST;
 
 app.use(cors({
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-    optionsSuccessStatus: 204
+    origin: '*',
+    preflightContinue: true,
+    optionsSuccessStatus: 204,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Length', 'Authorization', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept'],
+    exposedHeaders: ['Content-Length', 'Authorization', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/client/api/v1/auth', require('./routes/client/auth'));
 app.use('/client/api/v1/profiles', require('./routes/client/profile'));
 app.use('/client/api/v1/payments', require('./routes/client/payment'));
-app.use('/client/api/v1/projects', require('./routes/client/project'));
+app.use('/client/api/v1/databases', require('./routes/client/database'));
 app.use(require('./middlewares/endpoint-not-found'));
 app.use(require('./middlewares/send-response'));
 app.use(require('./middlewares/express-error-handler'));
 
 app.listen(APP_PORT, APP_HOST, error => {
     if (error) throw error;
-    else { 
+    else {
         require('./configs/mongodb').connect(logger);
         if (NODE_ENV === 'development') {
             require('./configs/sequelize').getSequelize().sync({ force: true });

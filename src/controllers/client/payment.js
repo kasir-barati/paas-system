@@ -1,12 +1,12 @@
 // const ZarinpalCheckout = require('zarinpal-checkout')
-const ZarinpalGateway = require('zarinpal-gateway');
+// const ZarinpalGateway = require('zarinpal-gateway');
 
 const User = require('../../models/user');
 const UserPayment = require('../../models/user-payment');
 const ErrorResponse = require('../../utils/error-response');
 const { promiseHandler } = require('../../utils/promise');
 // const zarinpal = ZarinpalCheckout.create(process.env.MERCHENT_CODE, true);
-const zarinpal = new ZarinpalGateway(process.env.MERCHENT_CODE, true)
+// const zarinpal = new ZarinpalGateway(process.env.MERCHENT_CODE, true)
 
 module.exports.postPayment = async (req, res, next) => {
     let { userId } = req;

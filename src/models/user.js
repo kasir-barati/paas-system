@@ -2,6 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 
 const sequelize = require('../configs/sequelize');
 const Role = require('./role');
+const Image = require('./image');
 
 class User extends Model{};
 User.init({
@@ -26,18 +27,21 @@ User.init({
         type: DataTypes.BOOLEAN
     },
     saltPassword: DataTypes.STRING,
-    hashedPassword: DataTypes.STRING,
-    isDeleted: {
-        defaultValue: false,
-        type: DataTypes.BOOLEAN
-    }
+    hashedPassword: DataTypes.STRING
 }, {
-    paranoid: false,
+    paranoid: true,
+    timestamps: true,
     modelName: 'users',
     sequelize: sequelize.getSequelize()
 });
 
+// 1
 Role.hasMany(User);
+// N
 User.belongsTo(Role);
+// 1
+User.hasMany(Image);
+// N
+Image.belongsTo(User);
 
 module.exports = User;

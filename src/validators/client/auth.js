@@ -67,7 +67,7 @@ module.exports.postPasswordReset = async (req, res, next) => {
         }
     });
     let errorMessage = [];
-    console.log(user.emailVerified);
+
     !user ? errorMessage.push('Email is wrong.') : '';
     !user.emailVerified ? errorMessage.push('This email is not verified.') : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
