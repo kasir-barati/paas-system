@@ -2,7 +2,7 @@ const axios = require('axios').default.create({
     baseURL: process.env.DOCKER_API_URI
 });
 
-module.exports = async Image => {
+module.exports = async (Image, userId) => {
     let response = await axios.get('/images/json');
     if (response.status !== 200) throw new Error('Docker could not handle request');
 
@@ -15,6 +15,7 @@ module.exports = async Image => {
         };
         if (i + 1 !== response.data.length) response.data[i].RepoTags[0].split(':')[0] === response.data[i + 1].RepoTags[0].split(':')[0] ? image.versions.push(response.data[i + 1].RepoTags[0].split(':')[1]) : '';
         await Image.create({
+            userId,
             type: 'base',
             imageId: null,
             id: image.id,

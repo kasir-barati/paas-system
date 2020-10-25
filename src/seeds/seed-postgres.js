@@ -13,6 +13,14 @@ const sequelize = require('../configs/sequelize');
 (async function() {
     await sequelize.getSequelize().sync({ force: true });
     await require('./role')(Role);
-    await require('./image')(Image);
     await require('./user')(Role, User);
+    
+    let sadminRole = await Role.findOne({
+        where: { accessLevel: 0 }
+    });
+    let sadmin = await User.findOne({
+        where: { roleId: sadminRole.id }
+    });
+
+    await require('./image')(Image, sadmin.id);
 })();
