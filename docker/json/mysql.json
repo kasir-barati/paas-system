@@ -4,6 +4,13 @@
         "ContainerSpec": {
             "Image": "mysql:VERSION",
             "Hostname": "HOSTNAME",
+            "Mounts": [{
+                "ReadOnly": false,
+                "Source": "VOLUME_NAME",
+                "Target": "/var/lib/mysql",
+                "Type": "volume",
+                "VolumeOptions": {}
+            }],
             "Env": [
                 "MYSQL_ROOT_PASSWORD=DB_PASS",
                 "MYSQL_DATABASE=DB_NAME"

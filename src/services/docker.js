@@ -5,7 +5,7 @@ const axios = require('axios').default.create({
 const ErrorResponse = require('../utils/error-response');
 
 module.exports.replaceJsonDataForDb = (json, { 
-    serviceName, version, cpu, ram, publishedPort, dbName, dbPass
+    serviceName, version, cpu, ram, publishedPort, dbName, dbPass, volumeName
 }) => {
     // set envs
     json = json.replace(/DB_NAME/g, dbName);
@@ -20,8 +20,16 @@ module.exports.replaceJsonDataForDb = (json, {
     // set resources
     json = json.replace(/NANO_CPU/g, cpu * 1_000_000_000);
     json = json.replace(/MEMORY_BYTE/g, ram * 1_073_741_824);
+    // set volume name
+    json = json.replace(/VOLUME_NAME/g, volumeName);
     // set network name
     // json = json.replace(/NETWORK_NAME/g, networkName);
+    return json;
+};
+
+module.exports.replaceJsonDataForVolume = (json, { volumeName, storageSize }) => {
+    // set storage size here
+    json = json.replace(/VOLUME_NAME/g, volumeName);
     return json;
 };
 
