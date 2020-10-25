@@ -3,6 +3,7 @@ const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../configs/sequelize');
 const Role = require('./role');
 const Image = require('./image');
+const Service = require('./service');
 
 class User extends Model{};
 User.init({
@@ -43,5 +44,9 @@ User.belongsTo(Role);
 User.hasMany(Image);
 // N
 Image.belongsTo(User);
+// 1
+User.hasMany(Service);
+// N
+Service.belongsTo(User);
 
 module.exports = User;
