@@ -11,7 +11,6 @@ const Service = require('../../models/service');
 const Container = require('../../models/container');
 const UnitPrice = require('../../models/unit-price');
 const dockerService = require('../../services/docker');
-const { unUsePort } = require('../../utils/port-scanner');
 const ErrorResponse = require('../../utils/error-response');
 const sequelizeTransaction = require('../../utils/sequelize-transaction');
 const CheckContainerOfService = require('../../models/check-container-of-service');
