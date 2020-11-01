@@ -1,5 +1,4 @@
 const ErrorResponse = require('../utils/error-response');
-const httpStatus = require('../utils/http-status');
 const Logger = require('../utils/logger');
 
 const logger = new Logger('express-error-handler');
@@ -15,6 +14,7 @@ module.exports = async (err, req, res, next) => {
             "ip": req.ip ? req.ip : null,
             "userAgent": req.get('user-agent'),
             "method": req.method ? req.method : null,
+            "body": req.body,
             "originalUrl": req.originalUrl ? req.originalUrl : null,
             "errorName": err.name,
             "errorStack": err.stack,
@@ -23,6 +23,9 @@ module.exports = async (err, req, res, next) => {
 
         // if error thrown because of database goes down you must send email to the admin
         switch (err.name) {
+            case 'ValidationError': 
+                error = new ErrorResponse('ValidationError', err.message, 400);;
+                break;
             case 'DockerError':
                 error = new ErrorResponse('DockerError', 'Docker could not handle request correctly', 500);;
                 break;
@@ -31,9 +34,12 @@ module.exports = async (err, req, res, next) => {
             case 'ReferenceError':
                 error = new ErrorResponse('ProgramingExeption', `Some kind of mistake happened in backend, please report it to the admin.`, 500);
                 break;
+            case 'SequelizeDatabaseError':
+                meta.sequelizeErrors = [];
+                meta.sequelizeErrors.push(meta.errorMessage);
+                break;
             case 'AssertionError':
             case 'MongoParseError':
-            case 'SequelizeDatabaseError':
             case 'SequelizeConnectionError':
             case 'MongoServerSelectionError':
             case 'SequelizeUniqueConstraintError':
@@ -71,7 +77,6 @@ module.exports = async (err, req, res, next) => {
         } else {
             logger.error('Server side error occured.', { meta });
         };
-
         res.status(err.statusCode === 401 ? 401 : 200).json({
             apiData: null,
             apiStatus: error.statusCode,

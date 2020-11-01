@@ -5,24 +5,25 @@ const Container = require('./container');
 
 class Service extends Model { };
 Service.init({
-    id: { // docker service id
+    id: {
         primaryKey: true,
-        type: DataTypes.STRING
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
+    serviceId: DataTypes.STRING, // docker serviceId
+    name: DataTypes.STRING,
     price: DataTypes.STRING,
-    resource: DataTypes.JSON, // { ram: 2, cpu: 1, storage: 5 }
-    port: DataTypes.STRING,
-    freeze: {
-        defaultValue: false,
-        type: DataTypes.BOOLEAN
-    }, // when user balance is 0
+    resources: DataTypes.JSON, // { ram: 2, cpu: 1, storage: 5 }
     scale: {
         defaultValue: 1,
         type: DataTypes.SMALLINT
-    }, // container account
-    name: DataTypes.STRING, // docker service name
-    state: DataTypes.STRING, // running, shutdown, acceepted
-    env: DataTypes.JSON // { a: 1, b: 'c' }/{ d: 'asd', e: 'a', l: 2 } docker service Envs
+    },
+    state: {
+        defaultValue: 'accepted',
+        type: DataTypes.ENUM('shutodwn', 'running', 'accepted', 'failed', 'freeze')
+    },
+    port: DataTypes.STRING, // exposed port
+    env: DataTypes.ARRAY(DataTypes.STRING) // { a: 1, b: 'c' }/{ d: 'asd', e: 'a', l: 2 } docker service Envs
 }, {
     paranoid: true,
     timestamps: true,

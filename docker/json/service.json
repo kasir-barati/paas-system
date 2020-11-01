@@ -1,20 +1,19 @@
 {
-    "Name": "SERVICE_NAME",
+    "Name": "",
     "TaskTemplate": {
         "ContainerSpec": {
-            "Image": "mysql:VERSION",
-            "Hostname": "HOSTNAME",
-            "Mounts": [{
-                "ReadOnly": false,
-                "Source": "VOLUME_NAME",
-                "Target": "/var/lib/mysql",
-                "Type": "volume",
-                "VolumeOptions": {}
-            }],
-            "Env": [
-                "MYSQL_ROOT_PASSWORD=DB_PASS",
-                "MYSQL_DATABASE=DB_NAME"
+            "Image": "",
+            "Hostname": "",
+            "Mounts": [
+                {
+                    "ReadOnly": false,
+                    "Source": "",
+                    "Target": "/var/lib/mysql",
+                    "Type": "volume",
+                    "VolumeOptions": {}
+                }
             ],
+            "Env": [],
             "DNSConfig": {
                 "Nameservers": [
                     "8.8.8.8"
@@ -23,8 +22,8 @@
         },
         "Resources": {
             "Limits": {
-                "NanoCPUs": NANO_CPU,
-                "MemoryBytes": MEMORY_BYTE
+                "NanoCPUs": 0,
+                "MemoryBytes": 0
             }
         },
         "RestartPolicy": {
@@ -38,6 +37,18 @@
             "Replicas": 1
         }
     },
+    "Placement": {
+        "Constaints": []
+    },
+    "Networks": [
+        {
+            "Target": "",
+            "Aliases": [
+                ""
+            ],
+            "DriverOpts": {}
+        }
+    ],
     "UpdateConfig": {
         "Parallelism": 1,
         "Delay": 1000000000,
@@ -56,8 +67,8 @@
         "Ports": [
             {
                 "Protocol": "tcp",
-                "PublishedPort": PUBLISHED_PORT,
-                "TargetPort": 3306
+                "PublishedPort": 0,
+                "TargetPort": 0
             }
         ]
     }

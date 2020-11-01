@@ -28,7 +28,7 @@ module.exports.login = async (req, res, next) => {
     let user = await User.findOne({ where: { email } });
 
     if (!user) {
-        errorMessage.push("Email/Password is wrong");
+        errorMessage.push("Wrong Email/Password.");
     } else {
         !await passwordUtil.compare(password, user.hashedPassword, user.saltPassword) ? errorMessage.push("Email/Password is wrong") : '';
     };
@@ -47,7 +47,7 @@ module.exports.resendEmailVerification = async (req, res, next) => {
     let { email } = req.body;
     let errorMessage = [];
     
-    !await User.findOne({ where: { email } }) ? errorMessage.push('Email is wrong.') : '';
+    !await User.findOne({ where: { email } }) ? errorMessage.push('Wrong email entered.') : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
 

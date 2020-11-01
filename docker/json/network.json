@@ -1,9 +1,0 @@
-{
-	"Name": "NAME",
-	"Ingress": false,
-	"Internal": false,
-	"Attachable": true,
-	"Driver": "overlay",
-	"EnableIPv6": false,
-	"CheckDuplicate": true
-}

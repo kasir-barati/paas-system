@@ -30,13 +30,9 @@ module.exports.register = async (req, res, next) => {
         let { email, password } = req.body;
         let role = await Role.findOne({ where: { accessLevel: 4 } });
         let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
-        // let jsonPath = path.join(__dirname, '..', '..', '..', 'docker', 'json', 'network.json');
-        // let json = await fsPromises.readFile(jsonPath, 'utf8');
-        // json = dockerService.replaceJsonDataForNetwork(json, {
-        //     networkName: email.split('@')[0]
-        // });
-        // let response = await axios.post('/networks/create', JSON.parse(json));
-        // if (response.status !== 201) return next(new ErrorResponse('DockerError', 'Docker could not create network.', response.status));
+        let networkExistence = await dockerService.checkNetwork(email.split('@')[0]);
+
+        !networkExistence ? await dockerService.createNetwork(email.split('@')[0]) : '';
 
         user = await User.create({
             email,
@@ -53,7 +49,7 @@ module.exports.register = async (req, res, next) => {
         }).save();
         stage = '1st';
         
-        await mail.sendMail(TALASHNET_EMAIL, email, 'Email verification - Talashnet', `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token.token}" >this link</a></h1>`);
+        mail.sendMail(TALASHNET_EMAIL, email, 'Email verification - Talashnet', `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token.token}" >this link</a></h1>`);
         stage = '2st';
 
         req.apiStatus = 200;
@@ -85,7 +81,10 @@ module.exports.login = async (req, res, next) => {
         userId: user.id
     }).save();
     req.apiStatus = 200;
-    req.apiData = accessToken;
+    req.apiData = {
+        access: accessToken,
+        refresh: ''
+    };
     req.apiError = null;
     next();
 };
@@ -104,7 +103,7 @@ module.exports.emailVerification = async (req, res, next) => {
 
     req.apiData = null;
     req.apiError = null;
-    req.apiStatus = httpStatus.success;
+    req.apiStatus = 200;
     next();
 };
 

@@ -7,6 +7,7 @@ require('dotenv').config({
 const User = require('../models/user');
 const Role = require('../models/role');
 const Image = require('../models/image');
+const UnitPrice = require('../models/unit-price');
 
 const sequelize = require('../configs/sequelize');
 
@@ -23,4 +24,5 @@ const sequelize = require('../configs/sequelize');
     });
 
     await require('./image')(Image, sadmin.id);
+    await require('./unit-price')(UnitPrice, sadmin.id);
 })();

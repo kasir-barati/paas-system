@@ -1,12 +1,9 @@
-// const path = require('path');
-// const { promises: fsPromises } = require('fs');
-
-// const axios = require('axios').default.create({
-//     baseURL: process.env.DOCKER_API_URI
-// });
+const axios = require('axios').default.create({
+    baseURL: process.env.DOCKER_API_URI
+});
 
 const passwordUtil = require('../utils/password');
-// const dockerService = require('../services/docker');
+const dockerService = require('../services/docker');
 
 module.exports = async (Role, User) => {
     let superAdminRole = await Role.findOne({ where: { accessLevel: 0 } });
@@ -57,7 +54,7 @@ module.exports = async (Role, User) => {
         roleId: sellerAdminRole.id
     });
     await User.create({
-        email: 'user@user.com',
+        email: 'amirhoseinamz45@gmail.com',
         name: 'user',
         phone: '09101234567',
         emailVerified: true,
@@ -65,10 +62,7 @@ module.exports = async (Role, User) => {
         saltPassword: userSalt,
         roleId: userRole.id
     });
-    // let jsonPath = path.join(__dirname, '..', '..', 'docker', 'json', 'network.json');
-    // let json = await fsPromises.readFile(jsonPath, 'utf8');
-    // json = dockerService.replaceJsonDataForNetwork(json, {
-    //     networkName: 'user'
-    // });
-    // await axios.post('/networks/create', JSON.parse(json));
+
+    let networkStatus = await dockerService.checkNetwork('user');
+    !networkStatus ? await dockerService.createNetwork('user') : '';
 };

@@ -1,4 +1,3 @@
-const httpStatus = require('../utils/http-status');
 const Logger = require('../utils/logger');
 const logger = new Logger('page-not-found');
 
