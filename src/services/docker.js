@@ -1,4 +1,5 @@
 const path = require('path');
+const crypto = require('crypto');
 const { promises: fsPromises } = require('fs');
 
 const axios = require('axios').default.create({
@@ -58,7 +59,7 @@ async function createService(name, imageName, imageVersion, cpu, ram, publishedP
 
         let serviceResponse = await axios.post('/services/create', serviceJson);
 
-        return serviceResponse.status === 201 ? serviceResponse.data : null;
+        return serviceResponse.status === 201 ? serviceResponse.data.ID : null;
     } catch (error) {
         await promiseHandler(axios.delete(`/services/${name}`));
         throw new ErrorResponse('DockerError', error.message, error.response.status);
@@ -79,19 +80,19 @@ async function createVolume(volumeName, storageSize) {
     };
 };
 
-async function createNetwork(networkName) {
+async function createNetwork() {
     try {
         let bodyJson = {
-            Name: `${networkName}`,
             Ingress: false,
             Internal: false,
             Attachable: true,
-            Driver: "overlay",
             EnableIPv6: false,
-            CheckDuplicate: true
+            Driver: "overlay",
+            CheckDuplicate: true,
+            Name: crypto.randomBytes(16).toString('hex')
         };
-        console.log(axios);
-        await axios.post(`/networks/create`, bodyJson);
+        let response = await axios.post(`/networks/create`, bodyJson);
+        return response.status === 200 ? response.data.Id : null;
     } catch(error) {
         await promiseHandler(axios.delete(`/networks/${networkName}`));
         throw new ErrorResponse('DockerError', error.message, error.response.status);

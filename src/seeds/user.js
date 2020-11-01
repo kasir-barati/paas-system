@@ -18,51 +18,53 @@ module.exports = async (Role, User) => {
     let { hashedPassword: userHashedPassword, salt: userSalt } = await passwordUtil.hashPassword('userPass1');
 
     await User.create({
-        email: 'sadmin@sadmin.com',
         name: 'super admin',
         phone: '09101234567',
         emailVerified: true,
-        hashedPassword: sadminHashedPassword,
         saltPassword: sadminSalt,
-        roleId: superAdminRole.id
+        roleId: superAdminRole.id,
+        email: 'sadmin@sadmin.com',
+        hashedPassword: sadminHashedPassword,
+        networkId: await dockerService.createNetwork()
     });
     await User.create({
-        email: 'admin@admin.com',
         name: 'admin',
-        phone: '09101234567',
         emailVerified: true,
-        hashedPassword: adminHashedPassword,
+        phone: '09101234567',
+        roleId: adminRole.id,
         saltPassword: adminSalt,
-        roleId: adminRole.id
+        email: 'admin@admin.com',
+        hashedPassword: adminHashedPassword,
+        networkId: await dockerService.createNetwork()
     });
     await User.create({
-        email: 'technicaladmin@admin.com',
-        name: 'technical admin',
-        phone: '09101234567',
         emailVerified: true,
-        hashedPassword: technicalAdminHashedPassword,
+        phone: '09101234567',
+        name: 'technical admin',
+        roleId: technicalAdminRole.id,
         saltPassword: technicalAdminSalt,
-        roleId: technicalAdminRole.id
+        email: 'technicaladmin@admin.com',
+        hashedPassword: technicalAdminHashedPassword,
+        networkId: await dockerService.createNetwork()
     });
     await User.create({
-        email: 'selleradmin@admin.com',
+        emailVerified: true,
         name: 'seller admin',
         phone: '09101234567',
-        emailVerified: true,
-        hashedPassword: sellerAdminHashedPassword,
+        roleId: sellerAdminRole.id,
         saltPassword: sellerAdminSalt,
-        roleId: sellerAdminRole.id
+        email: 'selleradmin@admin.com',
+        hashedPassword: sellerAdminHashedPassword,
+        networkId: await dockerService.createNetwork()
     });
     await User.create({
-        email: 'amirhoseinamz45@gmail.com',
         name: 'user',
+        roleId: userRole.id,
         phone: '09101234567',
         emailVerified: true,
-        hashedPassword: userHashedPassword,
         saltPassword: userSalt,
-        roleId: userRole.id
+        hashedPassword: userHashedPassword,
+        email: 'amirhoseinamz45@gmail.com',
+        networkId: await dockerService.createNetwork()
     });
-
-    let networkStatus = await dockerService.checkNetwork('user');
-    !networkStatus ? await dockerService.createNetwork('user') : '';
 };

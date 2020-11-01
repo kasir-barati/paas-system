@@ -16,6 +16,7 @@ User.init({
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
+    networkId: DataTypes.STRING,
     avatar: {
         type: DataTypes.STRING,
         defaultValue: 'http://www.gravatar.com/avatar/3b3be63a4c2a439b013787725dfce802?d=identicon'

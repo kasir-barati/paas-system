@@ -30,12 +30,11 @@ module.exports.register = async (req, res, next) => {
         let { email, password } = req.body;
         let role = await Role.findOne({ where: { accessLevel: 4 } });
         let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
-        let networkExistence = await dockerService.checkNetwork(email.split('@')[0]);
-
-        !networkExistence ? await dockerService.createNetwork(email.split('@')[0]) : '';
+        let networkId = await dockerService.createNetwork();
 
         user = await User.create({
             email,
+            networkId,
             hashedPassword,
             roleId: role.id,
             saltPassword: salt

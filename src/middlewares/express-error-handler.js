@@ -13,6 +13,7 @@ module.exports = async (err, req, res, next) => {
         let meta = {
             "ip": req.ip ? req.ip : null,
             "userAgent": req.get('user-agent'),
+            "headers": req.headers,
             "method": req.method ? req.method : null,
             "body": req.body,
             "originalUrl": req.originalUrl ? req.originalUrl : null,
