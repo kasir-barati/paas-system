@@ -4,7 +4,7 @@
   "description": "talashnet paas provider web app",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "NODE_ENV=production node src/app.js",
     "dev-start1": "nodemon src/app.js",
     "seed-postgres": "node src/seeds/seed-postgres.js",
     "dev-start2": "npm run seed-postgres; nodemon src/app.js"

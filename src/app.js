@@ -41,11 +41,7 @@ app.listen(APP_PORT, APP_HOST, error => {
     if (error) throw error;
     else {
         require('./configs/mongodb').connect(logger);
-        if (NODE_ENV === 'development') {
-            require('./configs/sequelize').getSequelize().sync({ force: true });
-        } else {
-            require('./configs/sequelize').getSequelize().sync();
-        };
+        NODE_ENV === 'development' ? require('./configs/sequelize').getSequelize().sync({ force: true }) : require('./configs/sequelize').getSequelize().sync();
         logger.info(`Server is up & running on ${NODE_ENV} mode. http://${APP_HOST}:${APP_PORT}`)
     };
 });

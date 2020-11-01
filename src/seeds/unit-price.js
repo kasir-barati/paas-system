@@ -1,4 +1,4 @@
-module.exports = (UnitPrice, sadminId) => {
+module.exports = async (UnitPrice, sadminId) => {
     await UnitPrice.create({
         unit: 1,
         price: 100,

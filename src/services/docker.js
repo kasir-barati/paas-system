@@ -90,6 +90,7 @@ async function createNetwork(networkName) {
             EnableIPv6: false,
             CheckDuplicate: true
         };
+        console.log(axios);
         await axios.post(`/networks/create`, bodyJson);
     } catch(error) {
         await promiseHandler(axios.delete(`/networks/${networkName}`));
