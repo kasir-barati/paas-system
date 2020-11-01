@@ -29,6 +29,7 @@ const APP_HOST = process.env.APP_HOST;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(require('./middlewares/middleware-logger'));
 app.use('/client/api/v1/auth', require('./routes/client/auth'));
 app.use('/client/api/v1/profiles', require('./routes/client/profile'));
 app.use('/client/api/v1/payments', require('./routes/client/payment'));
