@@ -135,6 +135,7 @@ async function checkNetwork(networkName) {
         let response = await axios.get(`/networks/${networkName}`);
         return response.status == 200 ? true : false;
     } catch (error) {
+        console.log();
         if (error.response.status === 404) {
             return false
         } else {
