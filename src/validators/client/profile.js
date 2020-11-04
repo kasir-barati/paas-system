@@ -1,10 +1,11 @@
 const ErrorResponse = require('../../utils/error-response');
+const passwordUtil = require('../../utils/password');
 const validator = require('../../utils/validator');
 const User = require('../../models/user');
 
 module.exports.putProfile = async (req, res, next) => {
-    let { id } = req.params;
-    let user = await User.findByPk(id);
+    let { userId } = req;
+    let user = await User.findByPk(userId);
     let { name, phone, avatar } = req.body;
     let errorMessage = [];
 
@@ -18,10 +19,24 @@ module.exports.putProfile = async (req, res, next) => {
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
 
-module.exports.deleteProfile = async (req, res, next) => {
-    let errorMessage = [];
-    let { id } = req.params;
+// module.exports.deleteProfile = async (req, res, next) => {
+//     let errorMessage = [];
+//     let { userId } = req;
     
-    !await User.findByPk(id) ? errorMessage.push("User id is wrong") : '';
+//     !await User.findByPk(userId) ? errorMessage.push("User id is wrong") : '';
+//     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
+// };
+
+module.exports.putPasswordReset = async (req, res, next) => {
+    let { userId } = req;
+    let errorMessage = [];
+    let user = await User.findByPk(userId);
+    let { newPassword, oldPassword } = req.body;
+
+    if (!await passwordUtil.compare(oldPassword, user.hashedPassword, user.saltPassword)) {
+        errorMessage.push("Entered old password is wrong");
+    } else {
+        !validator.isPassword(newPassword) ? errorMessage.push("New password does not fulfill requirements.") : '';
+    };
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };

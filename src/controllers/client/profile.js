@@ -1,8 +1,9 @@
 const User = require('../../models/user');
+const passwordUtil = require('../../utils/password');
 
 module.exports.getProfile = async (req, res, next) => {
-    let { id } = req.params;
-    let user = await User.findByPk(id);
+    let { userId } = req;
+    let user = await User.findByPk(userId);
 
     req.apiData = {
         user: user.id,
@@ -20,34 +21,55 @@ module.exports.getProfile = async (req, res, next) => {
 };
 
 module.exports.putProfile = async (req, res, next) => {
-    let { id } = req.params;
+    let { userId } = req;
     let { name, phone, avatar } = req.body;
     
     await User.update({
         name, phone, avatar
     }, {
         where: { 
-            id 
+            id: userId
         }
     });
+
     req.apiData = null;
     req.apiError = null;
     req.apiStatus = 200;
     next();
 };
 
-module.exports.deleteProfile = async (req, res, next) => {
-    let { id } = req.params;
+// module.exports.deleteProfile = async (req, res, next) => {
+//     let { userId } = req;
 
+//     await User.update({
+//         isDeleted: true
+//     }, {
+//         where: {
+//             id: userId
+//         }
+//     });
+
+//     req.apiData = null;
+//     req.apiError = null;
+//     req.apiStatus = 200;
+//     next();
+// };
+
+module.exports.putPasswordReset = async (req, res, next) => {
+    let { userId } = req;
+    let { newPassword } = req.body;
+    let { hashedPassword, salt } = await passwordUtil.hashPassword(newPassword);
+    
     await User.update({
-        isDeleted: true
+        hashedPassword, saltPassword: salt
     }, {
         where: {
-            id
+            id: userId
         }
     });
+
     req.apiData = null;
-    req.apiError = null;
     req.apiStatus = 200;
+    req.apiError = null;
     next();
 };
