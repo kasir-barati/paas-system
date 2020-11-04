@@ -76,8 +76,8 @@ module.exports.postPasswordReset = async (req, res, next) => {
 module.exports.putPasswordReset = async (req, res, next) => { 
     let { token, password } = req.body;
     let errorMessage = [];
-
+    
     !validator.isPassword(password) ? errorMessage.push("Password isn't valid.") : '';
-    !await Token.findOne({ token }) ? errorMessage.push('Token does not exist.') : '';
+    !await Token.findOne({ token }) ? errorMessage.push('Wrong token') : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };

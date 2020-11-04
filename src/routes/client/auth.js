@@ -24,9 +24,12 @@ router
     .post(asyncMiddlewareHandler(authValidator.emailVerification), asyncMiddlewareHandler(authController.emailVerification));
 
 router
-    .route('/password-reset')
-    .put(asyncMiddlewareHandler(authValidator.putPasswordReset), asyncMiddlewareHandler(authController.putPasswordReset))
+    .route('/forgot-password')
     .post(asyncMiddlewareHandler(authValidator.postPasswordReset), asyncMiddlewareHandler(authController.postPasswordReset));
+
+router
+    .route('/reset-password')
+    .put(asyncMiddlewareHandler(authValidator.putPasswordReset), asyncMiddlewareHandler(authController.putPasswordReset))
 
 router
     .route('/resend-email-verification')
