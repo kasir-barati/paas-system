@@ -8,7 +8,7 @@ const pbkdf2 = promisify(crypto.pbkdf2);
  * @param {string} password 
  * @param {string} hashedPassword 
  * @param {string} salt 
- * @return {Promise<Boolean>}
+ * @returns true/false
  */
 module.exports.compare = async (password, hashedPassword, salt) => { 
     let hashPassword = (await pbkdf2(password, salt, 1000, 64, 'sha512')).toString('hex');
