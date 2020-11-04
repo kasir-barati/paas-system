@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { isUser } = require('../../middlewares/jwt');
-const { asyncMiddlewareHandler } = require('../../utils/promise');
+const { middlewareHandler } = require('../../utils/promise');
 const profileValidator = require('../../validators/client/profile');
 const profileController = require('../../controllers/client/profile');
 
@@ -9,10 +9,15 @@ const profileController = require('../../controllers/client/profile');
 const router = express.Router();
 
 router
-    .route('/:id')
-    .all(asyncMiddlewareHandler(isUser))
-    .get(asyncMiddlewareHandler(profileController.getProfile))
-    .put(asyncMiddlewareHandler(profileValidator.putProfile), asyncMiddlewareHandler(profileController.putProfile))
-    .delete(asyncMiddlewareHandler(profileValidator.deleteProfile), asyncMiddlewareHandler(profileController.deleteProfile));
+    .route('/')
+    .all(middlewareHandler(isUser))
+    .get(middlewareHandler(profileController.getProfile))
+    .put(middlewareHandler(profileValidator.putProfile), middlewareHandler(profileController.putProfile))
+    // .delete(middlewareHandler(profileValidator.deleteProfile), middlewareHandler(profileController.deleteProfile));
+
+router
+    .route('/reset-password')
+    .all(middlewareHandler(isUser))
+    .put(middlewareHandler(profileValidator.putPasswordReset), middlewareHandler(profileController.putPasswordReset));
 
 module.exports = router;

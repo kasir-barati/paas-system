@@ -1,65 +1,65 @@
 const router = require('express').Router();
 
 const { isUser } = require('../../middlewares/jwt');
-const { asyncMiddlewareHandler } = require('../../utils/promise');
+const { middlewareHandler } = require('../../utils/promise');
 const projectValidator = require('../../validators/client/project');
 const projectController = require('../../controllers/client/project');
 
 // /client/api/v1/projects
 router
     .route('/')
-    .all(asyncMiddlewareHandler(isUser))
-    .get(asyncMiddlewareHandler(projectController.projectsList))
-    .post(asyncMiddlewareHandler(projectValidator.createProjectService), asyncMiddlewareHandler(projectController.createProjectService));
+    .all(middlewareHandler(isUser))
+    .get(middlewareHandler(projectController.projectsList))
+    .post(middlewareHandler(projectValidator.createProjectService), middlewareHandler(projectController.createProjectService));
 
 router
     .route('/:id')
-    .all(asyncMiddlewareHandler(isUser))
-    .delete(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectController.deleteProject));
+    .all(middlewareHandler(isUser))
+    .delete(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.deleteProject));
 
 router
     .route('/:id/upload-files')
-    .all(asyncMiddlewareHandler(isUser))
-    .post(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectController.uploadProjectZipFile));
+    .all(middlewareHandler(isUser))
+    .post(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.uploadProjectZipFile));
 
 router
     .route('/:id/create')
-    .all(asyncMiddlewareHandler(isUser))
-    .get(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectController.verifyProject));
+    .all(middlewareHandler(isUser))
+    .get(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.verifyProject));
 
 router
     .route('/:id/stats')
-    .all(asyncMiddlewareHandler(isUser))
-    .delete(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectController.projectStats));
+    .all(middlewareHandler(isUser))
+    .delete(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.projectStats));
 
 router
     .route('/:id/inspect')
-    .all(asyncMiddlewareHandler(isUser))
-    .delete(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectController.projectInspect));
+    .all(middlewareHandler(isUser))
+    .delete(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.projectInspect));
 
 router
     .route('/:id/logs')
-    .all(asyncMiddlewareHandler(isUser))
-    .delete(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectController.projectLogs));
+    .all(middlewareHandler(isUser))
+    .delete(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.projectLogs));
 
 router
     .route('/:id/exec')
-    .all(asyncMiddlewareHandler(isUser))
-    .delete(asyncMiddlewareHandler(projectValidator.checkProjectId), asyncMiddlewareHandler(projectValidator.execInProject), asyncMiddlewareHandler(projectController.execInProject));
+    .all(middlewareHandler(isUser))
+    .delete(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectValidator.execInProject), middlewareHandler(projectController.execInProject));
 
 router
     .route('/:id/update/resources')
-    .all(asyncMiddlewareHandler(isUser))
-    .put(asyncMiddlewareHandler(projectValidator.updateProjectResources), asyncMiddlewareHandler(projectController.updateProjectResources));
+    .all(middlewareHandler(isUser))
+    .put(middlewareHandler(projectValidator.updateProjectResources), middlewareHandler(projectController.updateProjectResources));
 
 router
     .route('/:id/update/envs')
-    .all(asyncMiddlewareHandler(isUser))
-    .put(asyncMiddlewareHandler(projectValidator.updateProjectEnvs), asyncMiddlewareHandler(projectController.updateProjectEnvs));
+    .all(middlewareHandler(isUser))
+    .put(middlewareHandler(projectValidator.updateProjectEnvs), middlewareHandler(projectController.updateProjectEnvs));
 
 router
     .route('/images')
-    .all(asyncMiddlewareHandler(isUser))
-    .get(asyncMiddlewareHandler(projectController.readProjectsImages));
+    .all(middlewareHandler(isUser))
+    .get(middlewareHandler(projectController.readProjectsImages));
 
 module.exports = router;

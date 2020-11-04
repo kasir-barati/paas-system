@@ -1,20 +1,20 @@
 const router = require('express').Router();
 
 const { isUser } = require('../../middlewares/jwt');
-const { asyncMiddlewareHandler } = require('../../utils/promise');
+const { middlewareHandler } = require('../../utils/promise');
 const paymentValidator = require('../../validators/client/payment');
 const paymentController = require('../../controllers/client/payment.js');
 
 // /client/api/v1/payments
 router
     .route('/')
-    .all(asyncMiddlewareHandler(isUser))
-    .post(asyncMiddlewareHandler(paymentValidator.postPayment), asyncMiddlewareHandler(paymentController.postPayment))
-    .get(asyncMiddlewareHandler(paymentController.getPayments));
+    .all(middlewareHandler(isUser))
+    .post(middlewareHandler(paymentValidator.postPayment), middlewareHandler(paymentController.postPayment))
+    .get(middlewareHandler(paymentController.getPayments));
 
 router
     .route('/:id')
-    .all(asyncMiddlewareHandler(isUser))
-    .get(asyncMiddlewareHandler(paymentValidator.paymentVerification), asyncMiddlewareHandler(paymentController.paymentVerification));
+    .all(middlewareHandler(isUser))
+    .get(middlewareHandler(paymentValidator.paymentVerification), middlewareHandler(paymentController.paymentVerification));
 
 module.exports = router;

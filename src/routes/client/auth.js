@@ -2,37 +2,37 @@ const express = require('express');
 
 const authController = require('../../controllers/client/auth');
 const authValidator = require('../../validators/client/auth');
-const { asyncMiddlewareHandler } = require('../../utils/promise');
+const { middlewareHandler } = require('../../utils/promise');
 
 // base URL: /client/api/v1/auth/
 const router = express.Router();
 
 router
     .route('/register')
-    .post(asyncMiddlewareHandler(authValidator.register), authController.register);
+    .post(middlewareHandler(authValidator.register), authController.register);
 
 router
     .route('/login')
-    .post(asyncMiddlewareHandler(authValidator.login), asyncMiddlewareHandler(authController.login));
+    .post(middlewareHandler(authValidator.login), middlewareHandler(authController.login));
 
 router
     .route('/logout')
-    .post(asyncMiddlewareHandler(authValidator.logout), asyncMiddlewareHandler(authController.logout));
+    .post(middlewareHandler(authValidator.logout), middlewareHandler(authController.logout));
 
 router
     .route('/email-verification')
-    .post(asyncMiddlewareHandler(authValidator.emailVerification), asyncMiddlewareHandler(authController.emailVerification));
+    .post(middlewareHandler(authValidator.emailVerification), middlewareHandler(authController.emailVerification));
 
 router
     .route('/forgot-password')
-    .post(asyncMiddlewareHandler(authValidator.postPasswordReset), asyncMiddlewareHandler(authController.postPasswordReset));
+    .post(middlewareHandler(authValidator.postPasswordReset), middlewareHandler(authController.postPasswordReset));
 
 router
     .route('/reset-password')
-    .put(asyncMiddlewareHandler(authValidator.putPasswordReset), asyncMiddlewareHandler(authController.putPasswordReset))
+    .put(middlewareHandler(authValidator.putPasswordReset), middlewareHandler(authController.putPasswordReset))
 
 router
     .route('/resend-email-verification')
-    .post(asyncMiddlewareHandler(authValidator.resendEmailVerification), asyncMiddlewareHandler(authController.resendEmailVerification))
+    .post(middlewareHandler(authValidator.resendEmailVerification), middlewareHandler(authController.resendEmailVerification))
 
 module.exports = router;
