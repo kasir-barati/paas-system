@@ -11,12 +11,11 @@ module.exports = async (err, req, res, next) => {
     } else {
         let error;
         let meta = {
-            "ip": req.ip ? req.ip : null,
-            "userAgent": req.get('user-agent'),
-            "headers": req.headers,
-            "method": req.method ? req.method : null,
+            "ip": req.ip,
             "body": req.body,
-            "originalUrl": req.originalUrl ? req.originalUrl : null,
+            "method": req.method,
+            "headers": req.headers,
+            "originalUrl": req.originalUrl,
             "errorName": err.name,
             "errorStack": err.stack,
             "errorMessage": err.message,

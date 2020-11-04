@@ -6,9 +6,10 @@ module.exports = (req, res, next) => {
         logger.warn('PageNotFound', {
             meta: {
                 "ip": req.ip,
+                "body": req.body,
                 "method": req.method,
+                "headers": req.headers,
                 "originalUrl": req.originalUrl,
-                "userAgent": req.get('user-agent'),
             }
         });
         req.apiStatus = 404;
