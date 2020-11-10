@@ -6,6 +6,7 @@ const crypto = require('crypto');
 //     baseURL: process.env.DOCKER_API_URI
 // });
 
+const jwt = require('../../utils/jwt');
 const mail = require('../../utils/mail');
 const Role = require('../../models/role');
 const User = require('../../models/user');
@@ -172,5 +173,29 @@ module.exports.putPasswordReset = async (req, res, next) => {
     req.apiData = null;
     req.apiStatus = 200;
     req.apiError = null;
+    next();
+};
+
+module.exports.checkToken = async (req, res, next) => {
+    let { access } = req.body;
+    let token = access.split(' ')[1];
+    let decoded = await jwt.verifyToken(token);
+    let user = await User.findByPk(decoded.sub);
+    let savedToken = await Token.findOne({ token });
+
+    if (!user) return next(new ErrorResponse('Unauthorized', 'Saved userId in payload does not exist in Database.', 401));
+
+    let role = await Role.findByPk(user.roleId);
+
+    if (role.accessLevel <= 4) 
+        return next(new ErrorResponse('Unauthorized', "User's access level is not lower than 4.", 401));
+    if (!savedToken) 
+        return next(new ErrorResponse('Unauthorized', 'Access token does not exist in Database.', 401))
+    if ((Date.now() - decoded.iat) > 60 * 60 * 1000 * 20) 
+        return next(new ErrorResponse('Unauthorized', 'Access token is near expiration date.', 401))
+
+    req.apiData = null;
+    req.apiError = null;
+    req.apiStatus = 200;
     next();
 };

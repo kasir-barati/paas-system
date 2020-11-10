@@ -35,4 +35,8 @@ router
     .route('/resend-email-verification')
     .post(middlewareHandler(authValidator.resendEmailVerification), middlewareHandler(authController.resendEmailVerification))
 
+router  
+    .route('/check-token')
+    .post(middlewareHandler(authValidator.checkToken), middlewareHandler(authController.checkToken));
+
 module.exports = router;

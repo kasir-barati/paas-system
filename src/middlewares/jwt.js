@@ -13,13 +13,13 @@ module.exports.isUser = async (req, res, next) => {
     let decoded = await jwt.verifyToken(token);
     let user = await User.findByPk(decoded.sub);
 
-    if (!user) return next(new ErrorResponse('Unauthorized', 'You are not authorized.', 401));
+    if (!user) return next(new ErrorResponse('Unauthorized', 'Saved userId in payload does not exist in Database.', 401));
 
     let role = await Role.findByPk(user.roleId);
 
-    if (role.accessLevel !== 4) return next(new ErrorResponse('Unauthorized', 'You are not authorized.', 401));
+    if (role.accessLevel <= 4) return next(new ErrorResponse('Unauthorized', "User's access level is not lower than 4.", 401));
 
-    if (!await Token.findOne({ token })) return next(new ErrorResponse('Unauthorized', 'You are not authorized.', 401))
+    if (!await Token.findOne({ token })) return next(new ErrorResponse('Unauthorized', 'Access token does not exist in Database.', 401))
 
     req.userId = decoded.sub;
     next();

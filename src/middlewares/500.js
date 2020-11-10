@@ -59,10 +59,10 @@ module.exports = async (err, req, res, next) => {
             case 'TokenExpiredError': 
             case 'JsonWebTokenError': 
             case 'NotBeforeError': 
-                error = new ErrorResponse('jwtError', `JWT error occured.`, 401);
+                error = new ErrorResponse('jwtError', `Wrong access token.`, 401);
                 break;
             case 'Unauthorized':
-                error = new ErrorResponse('Unauthorized', `JWT error occured.`, 403);
+                error = new ErrorResponse('Unauthorized', `Wrong access token.`, 401);
                 break;
             case 'PaymentFailed': 
                 error.message = `Payment failed. please retry again.`;

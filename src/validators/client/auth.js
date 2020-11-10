@@ -81,3 +81,12 @@ module.exports.putPasswordReset = async (req, res, next) => {
     !await Token.findOne({ token }) ? errorMessage.push('Wrong token') : '';
     errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
 };
+
+module.exports.checkToken = async (req, res, next) => {
+    let errorMessage = [];
+    let { access } = req.body;
+
+    if (!access) errorMessage.push('Token does not exists.');
+    
+    errorMessage.length ? next(new ErrorResponse('ValidationError', errorMessage.join('|'), 400)) : next();
+};
