@@ -1,6 +1,3 @@
-const crypto = require('crypto');
-
-const formidable = require('formidable');
 const axios = require('axios').default.create({
     baseURL: process.env.DOCKER_API_URI
 });
@@ -63,20 +60,6 @@ module.exports.createProjectService = async (req, res, next) => {
     next();
 };
 
-module.exports.uploadProjectZipFile = async (req, res, next) => {
-    let { id } = req.params;
-    let service = await Service.findByPk(id);
-    let form = formidable({
-        keepExtensions: true,
-        uploadDir: path.join(__dirname, '..',  '..', 'public', 'uploads')
-    });
-
-    form.parse(req);
-    form.on('fileBegin', (name, file) => {
-        file.path = path.join(__dirname, '..',  '..', 'public', 'uploads', `${Date.now()}_${file.name}`);
-    });
-};
-
 module.exports.createProjectViaFileUpload = async (req, res, next) => {
     let { userId } = req;
     let { id } = req.params;
@@ -121,21 +104,6 @@ module.exports.createProjectViaFileUpload = async (req, res, next) => {
     req.apiStatus = 200;
     req.apiError = null;
     req.apiData = container === null ? false : true;
-    next();
-};
-
-module.exports.readProjectsImages = async (req, res, next) => {
-    let images = await Image.findAll({
-        where: {
-            type: 'base',
-            imageId: null,
-            name: ''
-        }
-    });
-
-    req.apiStatus = 200;
-    req.apiError = null;
-    req.apiData = images;
     next();
 };
 

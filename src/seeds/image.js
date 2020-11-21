@@ -1,27 +1,35 @@
-const axios = require('axios').default.create({
-    baseURL: process.env.DOCKER_API_URI
-});
+const dockerService = require('../services/docker');
 
 module.exports = async (Image, userId) => {
-    let response = await axios.get('/images/json');
-    if (response.status !== 200) throw new Error('Docker could not handle request');
+    for (let image of await dockerService.listImages()) {
+        if (
+            !image.RepoTags?.[0]
+                .split(':')[0]
+                .match(/php|node|postgres/) &&
+            !image.RepoTags?.[0].split(':')[1]
+        )
+            continue;
 
-    for (let i = 0; i < response.data.length; i++) {
-        if (i - 1 !== -1 && response.data[i].RepoTags[0].split(':')[0] === response.data[i - 1].RepoTags[0].split(':')[0]) continue;
-        let image = {
-            id: response.data[i].Id.split(':')[1],
-            name: response.data[i].RepoTags[0].split(':')[0],
-            versions: [response.data[i].RepoTags[0].split(':')[1]]
-        };
-        if (i + 1 !== response.data.length) response.data[i].RepoTags[0].split(':')[0] === response.data[i + 1].RepoTags[0].split(':')[0] ? image.versions.push(response.data[i + 1].RepoTags[0].split(':')[1]) : '';
+        let inspectImage = await dockerService.inspectImage();
+
         await Image.create({
-            userId,
-            type: 'base',
-            imageId: null,
-            id: image.id,
-            name: image.name,
-            versions: image.versions,
-            picUrl: `${process.env.APP_HOST}:${process.env.APP_PORT}/static/docker-images/${response.data[i].RepoTags[0].split(":")[0]}.png`,
-        })
+            imageId: inspectImage.Id,
+            imageRepoTags: inspectImage.RepoTags,
+            imageRepoDigests: inspectImage.RepoDigests,
+            imageParentId: inspectImage.Parent,
+            imageCreated: inspectImage.Created,
+            imageContainer: inspectImage.Container,
+            imageExposedPort: inspectImage.ContainerConfig
+                .ExposedPorts
+                ? Object.keys(
+                      inspectImage.ContainerConfig
+                          .ExposedPorts,
+                  )[0].split('/')[0]
+                : 0,
+            imageEnv: inspectImage.ContainerConfig.Env,
+            imageCmd: inspectImage.ContainerConfig.Cmd,
+            imageWorkDir:
+                inspectImage.ContainerConfig.WorkingDir,
+        });
     }
 };

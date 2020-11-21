@@ -18,11 +18,6 @@ router
     .delete(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.deleteProject));
 
 router
-    .route('/:id/upload-files')
-    .all(middlewareHandler(isUser))
-    .post(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.uploadProjectZipFile));
-
-router
     .route('/:id/create')
     .all(middlewareHandler(isUser))
     .get(middlewareHandler(projectValidator.checkProjectId), middlewareHandler(projectController.verifyProject));
@@ -56,10 +51,5 @@ router
     .route('/:id/update/envs')
     .all(middlewareHandler(isUser))
     .put(middlewareHandler(projectValidator.updateProjectEnvs), middlewareHandler(projectController.updateProjectEnvs));
-
-router
-    .route('/images')
-    .all(middlewareHandler(isUser))
-    .get(middlewareHandler(projectController.readProjectsImages));
 
 module.exports = router;
