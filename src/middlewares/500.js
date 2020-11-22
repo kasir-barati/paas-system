@@ -44,6 +44,7 @@ module.exports = async (err, req, res, next) => {
             case 'MongoServerSelectionError':
             case 'SequelizeUniqueConstraintError':
             case 'SequelizeConnectionRefusedError':
+            case 'SequelizeForeignKeyConstraintError:':
                 meta.sequelizeErrors = [];
                 for (let item of err.errors) {
                     meta.sequelizeErrors.push({

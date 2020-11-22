@@ -1,26 +1,64 @@
 const jwt = require('../utils/jwt');
-const User = require('../models/user')
-const Role = require('../models/role');
 const Token = require('../models/token');
+const { promiseHandler } = require('../utils/promise');
 const ErrorResponse = require('../utils/error-response');
 
-module.exports.isUser = async (req, res, next) => {
+class AuthorizationError extends ErrorResponse {
+    constructor(message) {
+        super('AuthorizationError', message, 403);
+    }
+}
+
+class AuthenticationError extends ErrorResponse {
+    constructor(message) {
+        super('AuthenticationError', message, 401);
+    }
+}
+
+module.exports.isAuthenticated = async (req, res, next) => {
     let authHeader = req.headers.authorization;
 
-    if (!authHeader) return next(new ErrorResponse('jwtError', 'Something went wrong in the user JWT middleware', 401));
+    if (!authHeader) {
+        return next(
+            new AuthenticationError(
+                'Authorization does not exist in the incoming http header.',
+            ),
+        );
+    }
 
     let token = authHeader.split(' ')[1];
-    let decoded = await jwt.verifyToken(token);
-    let user = await User.findByPk(decoded.sub);
+    let [verifyError, decoded] = await promiseHandler(
+        jwt.verifyToken(token),
+    );
 
-    if (!user) return next(new ErrorResponse('Unauthorized', 'Saved userId in payload does not exist in Database.', 401));
+    if (verifyError) {
+        return next(
+            new AuthenticationError(verifyError.message),
+        );
+    }
 
-    let role = await Role.findByPk(user.roleId);
+    if (!(await Token.findOne({ token })))
+        return next(
+            new AuthenticationError(
+                'Access token does not exist in Database.',
+            ),
+        );
 
-    if (role.accessLevel <= 4) return next(new ErrorResponse('Unauthorized', "User's access level is not lower than 4.", 401));
+    req.user = decoded.user;
+    next();
+};
 
-    if (!await Token.findOne({ token })) return next(new ErrorResponse('Unauthorized', 'Access token does not exist in Database.', 401))
-
-    req.userId = decoded.sub;
+module.exports.authorize = (...roles) => (
+    req,
+    res,
+    next,
+) => {
+    if (!roles.includes(req.user.role)) {
+        return next(
+            new AuthorizationError(
+                `User access is limited. user role: ${req.user.role}. required role: ${roles}`,
+            ),
+        );
+    }
     next();
 };

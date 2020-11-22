@@ -9,10 +9,12 @@ Role.init({
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4
     },
-    department: DataTypes.STRING,
-    accessLevel: DataTypes.SMALLINT
+    title: {
+        type: DataTypes.ENUM('admin', 'user'),
+        defaultValue: 'admin'
+    }
 }, {
-    paranoid: false,
+    paranoid: true,
     modelName: 'roles',
     sequelize: sequelize.getSequelize()
 });

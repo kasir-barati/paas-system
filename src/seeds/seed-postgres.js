@@ -1,7 +1,7 @@
 const path = require('path');
 
 require('dotenv').config({
-    path: path.join(__dirname, '..', '..', '.env')
+    path: path.join(__dirname, '..', '..', '.env'),
 });
 
 const User = require('../models/user');
@@ -11,18 +11,18 @@ const UnitPrice = require('../models/unit-price');
 
 const sequelize = require('../configs/sequelize');
 
-(async function() {
+(async function () {
     await sequelize.getSequelize().sync({ force: true });
     await require('./role')(Role);
     await require('./user')(Role, User);
-    
-    let sadminRole = await Role.findOne({
-        where: { accessLevel: 0 }
+
+    let admin = await Role.findOne({
+        where: { title: 'admin' },
     });
-    let sadmin = await User.findOne({
-        where: { roleId: sadminRole.id }
+    let user = await User.findOne({
+        where: { roleId: admin.id },
     });
 
-    await require('./image')(Image, sadmin.id);
-    await require('./unit-price')(UnitPrice, sadmin.id);
+    await require('./image')(Image, user.id);
+    await require('./unit-price')(UnitPrice, user.id);
 })();

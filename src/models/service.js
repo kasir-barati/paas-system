@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 
 const sequelize = require('../configs/sequelize');
-const Container = require('./container');
+const Task = require('./task');
 
 class Service extends Model {}
 Service.init(
@@ -10,10 +10,6 @@ Service.init(
             primaryKey: true,
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
-        },
-        name: {
-            unique: true,
-            type: DataTypes.STRING,
         },
         serviceID: {
             type: DataTypes.STRING,
@@ -34,6 +30,7 @@ Service.init(
             type: DataTypes.STRING,
         },
         serviceHostname: {
+            unique: true,
             type: DataTypes.STRING,
         },
         serviceMounts: {
@@ -67,8 +64,8 @@ Service.init(
 );
 
 // 1
-Service.hasMany(Container);
+Service.hasMany(Task);
 // N
-Container.belongsTo(Service);
+Task.belongsTo(Service);
 
 module.exports = Service;

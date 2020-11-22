@@ -1,3 +1,6 @@
+const path = require('path');
+const crypto = require('crypto');
+
 const Dockerode = require('dockerode');
 
 const docker = new Dockerode({
@@ -13,6 +16,30 @@ const DOCKER_PATH = path.join(
     '..',
     'docker',
 );
+
+class InspectServiceError extends ErrorResponse {
+    constructor(message) {
+        super('DockerError', message, 500);
+    }
+}
+
+class CreateServiceError extends ErrorResponse {
+    constructor(message) {
+        super('DockerError', message, 500);
+    }
+}
+
+class ListNetworkError extends ErrorResponse {
+    constructor(message) {
+        super('DockerError', message, 500);
+    }
+}
+
+class CreateNetworkError extends ErrorResponse {
+    constructor(message) {
+        super('DockerError', message, 500);
+    }
+}
 
 class ListImagesError extends ErrorResponse {
     constructor(message) {
@@ -38,88 +65,73 @@ class ImageBuildError extends ErrorResponse {
     }
 }
 
-async function createService(
-    name,
-    imageName,
-    imageVersion,
+module.exports.inspectService = async (id) => {
+    try {
+        let inspectService = await docker
+            .getService(id)
+            .inspect();
+
+        return inspectService.data;
+    } catch (error) {
+        throw new InspectServiceError(error);
+    }
+};
+
+module.exports.createService = async (
+    hostname,
+    image,
     cpu,
     ram,
-    publishedPort,
-    volumeName,
-    networkName,
-    env,
-) {
+    env = [''],
+) => {
     try {
-        let targetPort, nodeHostname;
-        let serviceJson = await fsPromises.readFile(
-            serviceJsonPath,
-            'utf8',
-        );
-
-        serviceJson = JSON.parse(serviceJson);
-
-        switch (imageName) {
-            case 'wordpress':
-                targetPort = 80;
-                nodeHostname = 'debian';
-                break;
-            case 'mysql':
-                targetPort = 3306;
-                nodeHostname = 'debian';
-                break;
-            case 'postgres':
-                targetPort = 5432;
-                nodeHostname = 'debian';
-                break;
+        switch (image.imageRepoTags[0].split(':')) {
             case 'mariadb':
-                targetPort = 3306;
-                nodeHostname = 'debian';
+            case 'mysql': {
+                env.push(
+                    `MYSQL_ROOT_PASSWORD=${crypto
+                        .randomBytes(8)
+                        .toString('hex')}`,
+                );
+                env.push(
+                    `MYSQL_DATABASE=${crypto
+                        .randomBytes(4)
+                        .toString('hex')}`,
+                );
                 break;
-            case 'mongodb':
-                targetPort = 27017;
-                nodeHostname = 'debian';
-                break;
-            // case 'mssql':
-            //     targetPort = 1433;
-            //     nodeHostname = 'debian';
-            //     break;
+            }
         }
 
-        serviceJson.Name = name;
-        serviceJson.Networks[0].Target = networkName;
-        serviceJson.TaskTemplate.ContainerSpec.Env = env;
-        serviceJson.TaskTemplate.ContainerSpec.Hostname = name;
-        serviceJson.EndpointSpec.Ports[0].TargetPort = targetPort;
-        serviceJson.EndpointSpec.Ports[0].PublishedPort = publishedPort;
-        serviceJson.TaskTemplate.ContainerSpec.Mounts[0].Source = volumeName;
-        serviceJson.Placement.Constaints = [
-            `node.hostname==${nodeHostname}`,
-        ];
-        serviceJson.TaskTemplate.Resources.Limits.NanoCPUs =
-            cpu * 1_000_000_000;
-        serviceJson.TaskTemplate.Resources.Limits.MemoryBytes =
-            ram * 1_073_741_824;
-        serviceJson.TaskTemplate.ContainerSpec.Image = `${imageName}:${imageVersion}`;
+        let service = await docker.createService({
+            TaskTemplate: {
+                ContainerSpec: {
+                    Image: image.imageRepoTags[0],
+                    Env: env,
+                    Hostname: hostname,
+                },
+                Resources: {
+                    Limits: {
+                        NanoCPUs: cpu * 1_000_000_000,
+                        MemoryBytes: ram * 1_073_741_824,
+                    },
+                },
+            },
+            EndpointSpec: {
+                Mode: 'vip',
+                Ports: [
+                    {
+                        Protocol: 'tcp',
+                        TargetPort: image.imageExposedPort,
+                    },
+                ],
+            },
+        });
 
-        let serviceResponse = await axios.post(
-            '/services/create',
-            serviceJson,
-        );
-
-        return serviceResponse.status === 201
-            ? serviceResponse.data.ID
-            : null;
+        return service.data.ID;
     } catch (error) {
-        await promiseHandler(
-            axios.delete(`/services/${name}`),
-        );
-        throw new ErrorResponse(
-            'DockerError',
-            error.message,
-            error.response.status,
-        );
+        throw new CreateServiceError(error);
     }
-}
+};
 
 async function createVolume(volumeName, storageSize) {
     // set storage size here
@@ -142,28 +154,23 @@ async function createVolume(volumeName, storageSize) {
     }
 }
 
-async function createNetwork() {
-    try {
-        let bodyJson = {
-            Ingress: false,
-            Internal: false,
-            Attachable: true,
-            EnableIPv6: false,
-            Driver: 'overlay',
-            CheckDuplicate: true,
-            Name: crypto.randomBytes(16).toString('hex'),
-        };
-        // let response = await axios.post(`/networks/create`, bodyJson);
-        // return response.status === 200 ? response.data.Id : null;
-    } catch (error) {
-        // await promiseHandler(axios.delete(`/networks/${networkName}`));
-        throw new ErrorResponse(
-            'DockerError',
-            error.message,
-            error.response.status,
-        );
-    }
-}
+// module.exports.createNetwork = async () => {
+//     try {
+//         let network = await docker.createNetwork({
+//             Ingress: false,
+//             Internal: false,
+//             Attachable: true,
+//             Driver: 'overlay',
+//             EnableIPv6: false,
+//             CheckDuplicate: true,
+//             Name: crypto.randomBytes(16).toString('hex'),
+//         });
+
+//         return network.data.Id;
+//     } catch (error) {
+//         throw new CreateNetworkError(error.message);
+//     }
+// };
 
 async function containerOfService(serviceId) {
     try {
@@ -182,23 +189,18 @@ async function containerOfService(serviceId) {
     }
 }
 
-async function checkNetwork(networkName) {
-    try {
-        // let response = await axios.get(`/networks/${networkName}`);
-        // return response.status == 200 ? true : false;
-    } catch (error) {
-        console.log();
-        if (error.response.status === 404) {
-            return false;
-        } else {
-            throw new ErrorResponse(
-                'DockerError',
-                error.message,
-                error.response.status,
-            );
-        }
-    }
-}
+// module.exports.checkNetworkExistance = async (id) => {
+//     try {
+//         let network = docker.listNetworks({
+//             filters: {
+//                 id: ['09d77b180eab'],
+//             },
+//         });
+//         return response.data.length > 0 ? true : false;
+//     } catch (error) {
+//         throw new ListNetworkError(message);
+//     }
+// };
 
 async function deleteService(serviceId) {
     try {
@@ -295,6 +297,7 @@ module.exports.buildImage = async (imageContext, tag) => {
 
 module.exports.inspectImage = async (id) => {
     try {
+        console.log(id);
         let image = new Dockerode.Image(docker.modem, id);
         return await image.inspect();
     } catch (error) {

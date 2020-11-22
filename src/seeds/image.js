@@ -7,10 +7,13 @@ module.exports = async (Image, userId) => {
                 .split(':')[0]
                 .match(/php|node|postgres/) &&
             !image.RepoTags?.[0].split(':')[1]
-        )
+        ) {
             continue;
+        }
 
-        let inspectImage = await dockerService.inspectImage();
+        let inspectImage = await dockerService.inspectImage(
+            image.Id,
+        );
 
         await Image.create({
             imageId: inspectImage.Id,
@@ -30,6 +33,7 @@ module.exports = async (Image, userId) => {
             imageCmd: inspectImage.ContainerConfig.Cmd,
             imageWorkDir:
                 inspectImage.ContainerConfig.WorkingDir,
+            userId,
         });
     }
 };
