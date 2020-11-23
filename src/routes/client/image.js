@@ -27,3 +27,6 @@ router
     .route('/build')
     .all(middlewareHandler(isAuthenticated))
     .post(middlewareHandler(build));
+
+
+module.exports = router;

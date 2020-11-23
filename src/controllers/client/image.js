@@ -1,5 +1,7 @@
+const path = require('path');
 const { promises: fsPromises } = require('fs');
 
+const { Op } = require('sequelize');
 const { IncomingForm } = require('formidable');
 
 const Image = require('../../models/image');
@@ -69,9 +71,39 @@ module.exports.add = async (req, res, next) => {
 };
 
 module.exports.baseImagesList = async (req, res, next) => {
+    let { type } = req.query;
+    let selectImageCondition = [];
+
+    switch (type) {
+        case 'project': {
+            // selectImageCondition = /node|php/;
+            selectImageCondition = ['node', 'php'];
+            break;
+        }
+        case 'database': {
+            // selectImageCondition = /postgres|mysql|mariadb/;
+            selectImageCondition = [
+                'postgres',
+                'mysql',
+                'mariadb',
+            ];
+            break;
+        }
+        case 'prepared': {
+            // selectImageCondition = /wordpress/;
+            selectImageCondition = ['wordpress'];
+            break;
+        }
+    }
+
     let images = await Image.findAndCountAll({
         where: {
-            imageParentId: null,
+            imageParentId: '',
+            // imageRepoTags: {
+            //     [Op.iLike]: {
+            //         [Op.any]: selectImageCondition,
+            //     },
+            // },
         },
     });
     let list = [];
@@ -101,9 +133,10 @@ module.exports.baseImagesList = async (req, res, next) => {
         } else {
             list.push({
                 id: ++i,
-                name: image.imageRepoTags?.[0].split(
+                title: image.imageRepoTags?.[0].split(
                     ':',
                 )[0],
+                picUrl: image.picUrl,
                 versions: [
                     {
                         id: image.id,
@@ -118,7 +151,9 @@ module.exports.baseImagesList = async (req, res, next) => {
 
     req.apiError = null;
     req.apiData = {
-        list,
+        list: list.filter((image) =>
+            selectImageCondition.includes(image.title),
+        ),
         paging: {
             totalCount: images.count,
             currentPage: 0,

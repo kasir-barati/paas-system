@@ -1,42 +1,78 @@
 const express = require('express');
 
-const authController = require('../../controllers/client/auth');
+const {
+    login,
+    logout,
+    register,
+    checkToken,
+    forgotPassword,
+    putPasswordReset,
+    emailVerification,
+    resendEmailVerification,
+} = require('../../controllers/client/auth');
 const authValidator = require('../../validators/client/auth');
-const { middlewareHandler } = require('../../utils/promise');
+const {
+    middlewareHandler,
+} = require('../../utils/promise');
 
 // base URL: /client/api/v1/auth/
 const router = express.Router();
 
 router
     .route('/register')
-    .post(middlewareHandler(authValidator.register), authController.register);
+    .post(
+        middlewareHandler(authValidator.register),
+        middlewareHandler(register),
+    );
 
 router
     .route('/login')
-    .post(middlewareHandler(authValidator.login), middlewareHandler(authController.login));
+    .post(
+        middlewareHandler(authValidator.login),
+        middlewareHandler(login),
+    );
 
 router
     .route('/logout')
-    .post(middlewareHandler(authValidator.logout), middlewareHandler(authController.logout));
+    .post(
+        middlewareHandler(authValidator.logout),
+        middlewareHandler(logout),
+    );
 
 router
     .route('/email-verification')
-    .post(middlewareHandler(authValidator.emailVerification), middlewareHandler(authController.emailVerification));
-
-router
-    .route('/forgot-password')
-    .post(middlewareHandler(authValidator.postPasswordReset), middlewareHandler(authController.postPasswordReset));
-
-router
-    .route('/reset-password')
-    .put(middlewareHandler(authValidator.putPasswordReset), middlewareHandler(authController.putPasswordReset))
+    .post(
+        middlewareHandler(authValidator.emailVerification),
+        middlewareHandler(emailVerification),
+    );
 
 router
     .route('/resend-email-verification')
-    .post(middlewareHandler(authValidator.resendEmailVerification), middlewareHandler(authController.resendEmailVerification))
+    .post(
+        middlewareHandler(
+            authValidator.resendEmailVerification,
+        ),
+        middlewareHandler(resendEmailVerification),
+    );
 
-router  
+router
+    .route('/forgot-password')
+    .post(
+        middlewareHandler(authValidator.forgotPassword),
+        middlewareHandler(forgotPassword),
+    );
+
+router
+    .route('/reset-password')
+    .put(
+        middlewareHandler(authValidator.putPasswordReset),
+        middlewareHandler(putPasswordReset),
+    );
+
+router
     .route('/check-token')
-    .post(middlewareHandler(authValidator.checkToken), middlewareHandler(authController.checkToken));
+    .post(
+        middlewareHandler(checkToken),
+    );
 
 module.exports = router;

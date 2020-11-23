@@ -22,6 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(require('./middlewares/logger'));
 app.use('/client/api/v1/auth', require('./routes/client/auth'));
+app.use('/client/api/v1/images', require('./routes/client/image'));
 app.use('/client/api/v1/profiles', require('./routes/client/profile'));
 app.use('/client/api/v1/payments', require('./routes/client/payment'));
 app.use('/client/api/v1/projects', require('./routes/client/project'));
@@ -33,7 +34,7 @@ app.listen(APP_PORT, APP_HOST, error => {
     if (error) throw error;
     else {
         require('./configs/mongodb').connect(logger);
-        NODE_ENV === 'development' ? require('./configs/sequelize').getSequelize().sync({ force: true }) : require('./configs/sequelize').getSequelize().sync();
+        require('./configs/sequelize').getSequelize().sync({ force: false });
         logger.info(`Server is up & running on ${NODE_ENV} mode. http://${APP_HOST}:${APP_PORT}`)
     };
 });

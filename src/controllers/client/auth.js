@@ -2,10 +2,6 @@
 const crypto = require('crypto');
 // const { promises: fsPromises } = require('fs');
 
-// const axios = require('axios').default.create({
-//     baseURL: process.env.DOCKER_API_URI
-// });
-
 const jwt = require('../../utils/jwt');
 const mail = require('../../utils/mail');
 const Role = require('../../models/role');
@@ -13,11 +9,20 @@ const User = require('../../models/user');
 const Token = require('../../models/token');
 const authService = require('../../services/auth');
 const passwordUtil = require('../../utils/password');
-const dockerService = require('../../services/docker');
+const { promiseHandler } = require('../../utils/promise');
+const ErrorResponse = require('../../utils/error-response');
 
-const UI_EMAIL_VERIFICATION_URI = process.env.UI_EMAIL_VERIFICATION_URI;
-const UI_PASSWORD_RESET_URI = process.env.UI_PASSWORD_RESET_URI;
+const UI_EMAIL_VERIFICATION_URI =
+    process.env.UI_EMAIL_VERIFICATION_URI;
+const UI_PASSWORD_RESET_URI =
+    process.env.UI_PASSWORD_RESET_URI;
 const TALASHNET_EMAIL = process.env.TALASHNET_EMAIL;
+
+class CheckTokenError extends ErrorResponse {
+    constructor(message) {
+        super('AuthenticationError', message, 401);
+    }
+}
 
 /**
  * @description Create new account
@@ -26,80 +31,85 @@ const TALASHNET_EMAIL = process.env.TALASHNET_EMAIL;
  * @next        Call next middleware to send back response
  */
 module.exports.register = async (req, res, next) => {
-    let stage, user, token;
-    try {
-        let { email, password } = req.body;
-        let role = await Role.findOne({ where: { accessLevel: 4 } });
-        let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
-        let networkId = await dockerService.createNetwork();
+    let { email, password } = req.body;
+    let role = await Role.findOne({
+        where: { accessToken: 'user' },
+    });
+    let {
+        hashedPassword,
+        salt,
+    } = await passwordUtil.hashPassword(password);
+    let user = await User.create({
+        email,
+        hashedPassword,
+        roleId: role.id,
+        saltPassword: salt,
+    });
+    let token = await new Token({
+        userId: user.id,
+        type: 'email-verification',
+        token: crypto.randomBytes(32).toString('hex'),
+    }).save();
 
-        user = await User.create({
-            email,
-            networkId,
-            hashedPassword,
-            roleId: role.id,
-            saltPassword: salt
-        });
-        stage = '0st';
+    mail.sendMail(
+        'noreply@talashnet.info',
+        email,
+        'Talashnet - Email verification',
+        `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token.token}" >this link</a></h1>`,
+    );
 
-        token = await new Token({
-            userId: user.id,
-            type: 'email-verification',
-            token: crypto.randomBytes(32).toString('hex')
-        }).save();
-        stage = '1st';
-        
-        mail.sendMail(TALASHNET_EMAIL, email, 'Email verification - Talashnet', `<h1>please click <a href="${UI_EMAIL_VERIFICATION_URI}/${token.token}" >this link</a></h1>`);
-        stage = '2st';
-
-        req.apiStatus = 200;
-        req.apiData = null;
-        req.apiError = null;
-        next();
-    } catch(error) {
-        switch (stage) {
-            case '2st': 
-                await token.remove();
-            case '1st': 
-                await user.destroy({ force: true });
-                break;
-        };
-        next(error);
-    };
+    req.apiStatus = 200;
+    req.apiData = null;
+    req.apiError = null;
+    next();
 };
 
 module.exports.login = async (req, res, next) => {
     let { email } = req.body;
-    let user = await User.findOne({
-        where: { email }
-    });
-    let accessToken = await authService.generateAccessToken(user.id);
+    let user = await User.scope('justBasicDetails').findOne(
+        {
+            where: { email },
+        },
+    );
+    let role = await Role.findByPk(user.roleId);
+    delete user.dataValues.roleId;
+    let accessToken = await authService.generateAccessToken(
+        user.dataValues,
+        role.title,
+    );
 
     await new Token({
         token: accessToken,
         type: 'jwt',
-        userId: user.id
+        userId: user.id,
     }).save();
     req.apiStatus = 200;
     req.apiData = {
         access: accessToken,
-        refresh: ''
+        refresh: '',
     };
     req.apiError = null;
     next();
 };
 
-module.exports.emailVerification = async (req, res, next) => {
+module.exports.emailVerification = async (
+    req,
+    res,
+    next,
+) => {
     let { token } = req.body;
     let t = await Token.findOneAndDelete({ token });
 
-    await User.update({
-        emailVerified: true
-    }, {
-        where: {
-            id: t.userId
-        }
-    });
+    await User.update(
+        {
+            emailVerified: true,
+        },
+        {
+            where: {
+                id: t.userId,
+            },
+        },
+    );
 
     req.apiData = null;
     req.apiError = null;
@@ -107,19 +117,23 @@ module.exports.emailVerification = async (req, res, next) => {
     next();
 };
 
-module.exports.resendEmailVerification = async (req, res, next) => {
+module.exports.resendEmailVerification = async (
+    req,
+    res,
+    next,
+) => {
     let { email } = req.body;
-    let user = await User.findOne({ 
-        where: { 
-            email 
-        } 
+    let user = await User.findOne({
+        where: {
+            email,
+        },
     });
     let token = crypto.randomBytes(32).toString('hex');
 
     await new Token({
         token,
         userId: user.id,
-        type: 'email-verification'
+        type: 'email-verification',
     }).save();
     req.apiData = null;
     req.apiError = null;
@@ -137,39 +151,57 @@ module.exports.logout = async (req, res, next) => {
     next();
 };
 
-module.exports.postPasswordReset = async (req, res, next) => {
+module.exports.forgotPassword = async (req, res, next) => {
     let { email } = req.body;
     let user = await User.findOne({
         where: {
-            email
-        }
+            email,
+        },
     });
     let token = crypto.randomBytes(32).toString('hex');
-    
+
     await new Token({
         token,
         userId: user.id,
-        type: 'password-reset'
+        type: 'password-reset',
     }).save();
-    await mail.sendMail(TALASHNET_EMAIL, email, 'Password reset - Talashnet', `<h1>please click <a href="${UI_PASSWORD_RESET_URI}/${token}" >this link</a></h1>`);
+    await mail.sendMail(
+        TALASHNET_EMAIL,
+        email,
+        'Password reset - Talashnet',
+        `<h1>please click <a href="${UI_PASSWORD_RESET_URI}/${token}" >this link</a></h1>`,
+    );
     req.apiData = null;
     req.apiStatus = 200;
     req.apiError = null;
     next();
 };
 
-module.exports.putPasswordReset = async (req, res, next) => {
+module.exports.putPasswordReset = async (
+    req,
+    res,
+    next,
+) => {
     let { token, password } = req.body;
-    let fetchedToken = await Token.findOneAndDelete({ token });
-    let { hashedPassword, salt } = await passwordUtil.hashPassword(password);
-    
-    await User.update({
-        hashedPassword, saltPassword: salt
-    }, {
-        where: {
-            id: fetchedToken.userId
-        }
+    let fetchedToken = await Token.findOneAndDelete({
+        token,
     });
+    let {
+        hashedPassword,
+        salt,
+    } = await passwordUtil.hashPassword(password);
+
+    await User.update(
+        {
+            hashedPassword,
+            saltPassword: salt,
+        },
+        {
+            where: {
+                id: fetchedToken.userId,
+            },
+        },
+    );
     req.apiData = null;
     req.apiStatus = 200;
     req.apiError = null;
@@ -177,22 +209,50 @@ module.exports.putPasswordReset = async (req, res, next) => {
 };
 
 module.exports.checkToken = async (req, res, next) => {
-    let { access } = req.body;
-    let token = access.split(' ')[1];
-    let decoded = await jwt.verifyToken(token);
-    let user = await User.findByPk(decoded.sub);
+    let { accessToken } = req.body;
+    let token = accessToken.split(' ')[1];
+    let [error, decoded] = await promiseHandler(
+        jwt.verifyToken(token),
+    );
+    let user = await User.findByPk(decoded.user.id);
     let savedToken = await Token.findOne({ token });
 
-    if (!user) return next(new ErrorResponse('Unauthorized', 'Saved userId in payload does not exist in Database.', 401));
+    if (error)
+        return next(
+            new CheckTokenError(
+                'Entered token is not valid',
+            ),
+        );
 
-    let role = await Role.findByPk(user.roleId);
+    if (!user)
+        return next(
+            new CheckTokenError(
+                'Saved userId in payload does not exist in Database.',
+            ),
+        );
 
-    if (role.accessLevel <= 4) 
-        return next(new ErrorResponse('Unauthorized', "User's access level is not lower than 4.", 401));
-    if (!savedToken) 
-        return next(new ErrorResponse('Unauthorized', 'Access token does not exist in Database.', 401))
-    if ((Date.now() - decoded.iat) > 60 * 60 * 1000 * 20) 
-        return next(new ErrorResponse('Unauthorized', 'Access token is near expiration date.', 401))
+    let role = await Role.findOne({
+        where: { title: decoded.user.role },
+    });
+
+    if (role.id !== decoded.user.role)
+        return next(
+            new CheckTokenError(
+                "User's access level is not lower than 4.",
+            ),
+        );
+    if (!savedToken)
+        return next(
+            new CheckTokenError(
+                'Access token does not exist in Database.',
+            ),
+        );
+    if (Date.now() - decoded.iat > 60 * 60 * 1000 * 20)
+        return next(
+            new CheckTokenError(
+                'Access token is near expiration date.',
+            ),
+        );
 
     req.apiData = null;
     req.apiError = null;

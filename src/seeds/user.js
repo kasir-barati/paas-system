@@ -1,5 +1,4 @@
 const passwordUtil = require('../utils/password');
-const dockerService = require('../services/docker');
 
 module.exports = async (Role, User) => {
     let adminRole = await Role.findOne({
@@ -33,6 +32,6 @@ module.exports = async (Role, User) => {
         emailVerified: true,
         saltPassword: userSalt,
         hashedPassword: userHashedPassword,
-        email: 'amirhoseinamz45@gmail.com',
+        email: 'user@gmail.com',
     });
 };
