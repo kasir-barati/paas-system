@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const { isUser } = require('../../middlewares/jwt');
 const { middlewareHandler } = require('../../utils/promise');
-const projectValidator = require('../../validators/client/project');
+const projectValidator = require('../../validators/client/service');
 const projectController = require('../../controllers/client/project');
 
 // /client/api/v1/projects

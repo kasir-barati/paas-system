@@ -15,8 +15,8 @@ module.exports.createProjectService = async (
 ) => {
     let { userId } = req;
     let { hostname, ram, cpu, storage, imageId } = req.body;
-    let image = await Image.findByPk(imageId);
     let user = await User.findByPk(userId);
+    let image = await Image.findByPk(imageId);
     let ramPrice = await UnitPrice.findOne({
         where: {
             deletedAt: null,
