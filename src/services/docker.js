@@ -1,5 +1,6 @@
 const path = require('path');
 const crypto = require('crypto');
+const { promises: fsPromises } = require('fs');
 
 const Dockerode = require('dockerode');
 
@@ -232,20 +233,20 @@ module.exports.generateDockerfile = async (
         );
 
         dockerfile = dockerfile.replace(
-            /REPO_TAG/,
+            /REPO_TAG/g,
             repoTag,
         );
         dockerfile = dockerfile.replace(
-            /IMAGE_WORK_DIR/,
+            /IMAGE_WORK_DIR/g,
             workDir,
         );
         dockerfile = dockerfile.replace(
-            /EXPOSE_PORT/,
+            /EXPOSE_PORT/g,
             exposedPort,
         );
         cmdCommand
             ? (dockerfile = dockerfile.replace(
-                  /#CMD_COMMAND/,
+                  /#CMD_COMMAND/g,
                   cmdCommand,
               ))
             : '';

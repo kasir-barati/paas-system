@@ -8,6 +8,8 @@ const {
     middlewareHandler,
 } = require('../../utils/promise');
 
+const imageValidator = require('../../validators/client/image');
+
 const {
     build,
     baseImagesList,
@@ -26,7 +28,9 @@ router
 router
     .route('/build')
     .all(middlewareHandler(isAuthenticated))
-    .post(middlewareHandler(build));
-
+    .post(
+        middlewareHandler(imageValidator.build),
+        middlewareHandler(build),
+    );
 
 module.exports = router;

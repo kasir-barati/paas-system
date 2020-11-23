@@ -1,11 +1,13 @@
 const path = require('path');
 const { promises: fsPromises } = require('fs');
 
-const { Op } = require('sequelize');
+// const { Op } = require('sequelize');
+const extractZip = require('extract-zip');
 const { IncomingForm } = require('formidable');
 
 const Image = require('../../models/image');
 const dockerService = require('../../services/docker');
+const { promiseHandler } = require('../../utils/promise');
 
 const DOCKER_PATH = path.join(
     __dirname,
@@ -30,12 +32,29 @@ module.exports.uploadProjectZipFile = async (
     form.on('fileBegin', async (name, file) => {
         let extractDir = path.join(
             DOCKER_PATH,
+            `${Date.now()}`,
+        );
+        let imageContext = path.join(
+            DOCKER_PATH,
             newImage.id,
         );
 
         await fsPromises.mkdir(extractDir);
+        await fsPromises.mkdir(imageContext);
         await extractZip(file.path, { dir: extractDir });
-        await fsPromises.rm(file.path);
+
+        let directoryContent = await fsPromises.readdir(
+            extractDir,
+        );
+        await fsPromises.rename(
+            directoryContent.length === 1
+                ? path.join(extractDir, directoryContent[0])
+                : extractDir,
+            imageContext,
+        );
+
+        await promiseHandler(fsPromises.rm(file.path));
+        await promiseHandler(fsPromises.rmdir(extractDir));
     });
     form.on('error', next);
     form.on('end', () => {
@@ -175,7 +194,21 @@ module.exports.build = async (req, res, next) => {
         baseImage.imageRepoTags[0].split(':')[0]
     }:${Date.now()}`;
 
-    await dockerService.generateDockerfile(imageContext);
+    await dockerService.generateDockerfile(imageContext, {
+        workDir: baseImage.imageWorkDir,
+        repoTag: baseImage.imageRepoTags[0],
+        cmdCommand:
+            baseImage.imageRepoTags[0].split(':')[0] ===
+            'node'
+                ? 'CMD ["npm", "start"]'
+                : '',
+        runCommand:
+            baseImage.imageRepoTags[0].split(':')[0] ===
+            'node'
+                ? 'RUN npm install && npm build'
+                : '',
+        exposedPort: baseImage.imageExposedPort,
+    });
 
     let imageId = await dockerService.buildImage(
         imageContext,
