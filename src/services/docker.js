@@ -278,7 +278,7 @@ module.exports.buildImage = async (imageContext, tag) => {
                 t: tag,
             },
         );
-        let dockerImageId = await new Promise(
+        let imageBuildingStreamArray = await new Promise(
             (resolve, reject) => {
                 docker.modem.followProgress(
                     buildProgress,
@@ -290,7 +290,7 @@ module.exports.buildImage = async (imageContext, tag) => {
             },
         );
 
-        return dockerImageId;
+        return tag;
     } catch (error) {
         throw new ImageBuildError(error);
     }

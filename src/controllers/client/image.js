@@ -210,12 +210,18 @@ module.exports.build = async (req, res, next) => {
         exposedPort: baseImage.imageExposedPort,
     });
 
-    let imageId = await dockerService.buildImage(
+    let imageTag = await dockerService.buildImage(
         imageContext,
         newImageTag,
     );
+
+    await fsPromises.rm(imageContext, {
+        recursive: true,
+        force: true,
+    });
+
     let inspectImage = await dockerService.inspectImage(
-        imageId,
+        imageTag,
     );
 
     newImage.imageId = inspectImage.Id;
@@ -224,8 +230,9 @@ module.exports.build = async (req, res, next) => {
     newImage.imageParentId = inspectImage.Parent;
     newImage.imageCreated = inspectImage.Created;
     newImage.imageContainer = inspectImage.Container;
-    newImage.imageExposedPort =
-        inspectImage.ContainerConfig.ExposedPorts;
+    newImage.imageExposedPort = Object.keys(
+        inspectImage.ContainerConfig.ExposedPorts,
+    )[0].split('/')[0];
     newImage.imageEnv = inspectImage.ContainerConfig.Env;
     newImage.imageCmd = inspectImage.ContainerConfig.Cmd;
     newImage.imageWorkDir =
