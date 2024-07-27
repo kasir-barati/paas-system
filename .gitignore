@@ -1,0 +1,7 @@
+cloudformation
+ec2-fundamentals
+s3
+**/*.pem
+**/*.pdf
+**/*.html
+**/*.htm
