@@ -1,3 +1,6 @@
+**/*.pem
+**/*.pdf
+
 # Logs
 logs
 *.log
