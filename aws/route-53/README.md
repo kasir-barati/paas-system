@@ -1,9 +1,11 @@
 # Route 53
 
 - Managed by AWS.
-- A Domain Name System[^1].
+- A Domain Name System (DNS)[^1].
 - Route users to the closest deployment with minimum latency.
 - Used for disaster recovery.
+- A Domain registration.
+- Can help you with health checks to detect unresponsive servers.
 
 ## DNS Records
 
