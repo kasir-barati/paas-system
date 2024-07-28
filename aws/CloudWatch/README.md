@@ -162,4 +162,25 @@ But we can also create our own metrics.
   - Auto scaling.
   - Perform EC2 actions: stop/terminate/reboot/recover.
   - SNS notifications.
+    1. You can easily create a new topic in SNS and subscribe to it with your email.
+    2. Then in your CloudWatch you only need to create an alarm that publishes a message to that topic.
 - Billing alarms can help us with budget management.
+
+## CloudWatch logs
+
+- Collecting log files.
+- Can collects from:
+  - ECS.
+  - Lambda.
+  - Route 53.
+  - CloudTrail.
+  - CloudWatch log agents installed on <table style="display:inline"><tr><td>EC2 instances[^1]</td></tr><tr><td>on-premises servers</td></tr></table>.
+  - Elastic Beanstalk.
+- You can monitor logs in real-time.
+- Configurable in terms of retention; for how long should I keep them.
+
+![How CloudWatch logs can collect logs from different sources with its agent](./cloudwatch-log-agent.png)
+
+# Footnotes
+
+[^1]: For this to work we need proper IAM role.
