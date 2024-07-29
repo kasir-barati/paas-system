@@ -3,6 +3,7 @@
 - [CloudFront](./aws/CloudFront/README.md)
 - [CloudTrail](./aws/CloudTrail/README.md)
 - [CloudWatch](./aws/CloudWatch/README.md)
+- [CodeGuru](./aws/CodeGuru/README.md)
 - [EC2](./aws/EC2/README.md)
 - [Elastic Beanstalk](./aws/Elastic-Beanstalk/README.md)
 - [EventBridge](./aws/EventBridge/README.md)
