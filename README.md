@@ -9,6 +9,7 @@
 - [EventBridge](./aws/EventBridge/README.md)
 - [Global Accelerator](./aws/Global-Accelerator/README.md)
 - [Global Applications](./aws/global-app/README.md)
+- [Health Dashboard](./aws/Health-Dashboard/README.md)
 - [Local Applications](./aws/local-app/README.md)
 - [Networking](./aws/networking/README.md)
 - [Outposts](./aws/Outposts/README.md)
