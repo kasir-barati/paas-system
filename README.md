@@ -1,20 +1,12 @@
-# talashnet-monolithic
-an monolithic web app to provide PaaS
+# Note
 
-## Installation
+1. I love to hear your thoughts about the things that I am doing here. So reach out. Or better yet, formulate your thoughts in a GH issue.
+2. Most of the things I am putting in this repo are my own original creation, although I'm not reinventing the wheel when it is out there. So I might have taken some parts of other's creation and modified them to suit my needs. So credits goes still to the original creator of those contents.
 
-- Rename .env.example to .env file
-- npm i
-- npm start
+# Initial codebase
 
-```bash
-npm i && npm start
-```
+This repo was intended to be a professional RESTful API in time, but it didn't come to fruition. So now you can see my endeavour [here](https://github.com/kasir-barati/paas-system/tree/initial-branch).
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+# AWS cloud practitioner course
 
-Please make sure to update tests as appropriate.
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
+And since I love cloud and I just took an AWS course in Udemy to hone my skills and knowledge in AWS I created a [new branch](https://github.com/kasir-barati/paas-system/tree/cloud-practitioner) where I am marking up my notes.
