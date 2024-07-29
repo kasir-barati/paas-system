@@ -75,7 +75,10 @@ Next stop after creating VPC is to create subnets.
 - Stands for Network Access Control List.
 - Virtual firewall around subnets.
 - Stateless: You need to define outbound rules to let requests out (implying that you do not have access to outside world unless you explicitly define it).
-- Can be used to block an IP address at subnet level.
+- Can be used to block an **IP address** at subnet level.
+- ALLOW or DENY rules.
+
+![How NACL works](./assets/nacl.png)
 
 ### Route tables
 
@@ -136,7 +139,20 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 
 - Virtual firewall around our EC2 instance
 - They are associated with _network interfaces_.
-- Stateful
+- Stateful.
+- Can only ALLOW.
+- Can reference other security groups.
+
+![Security group usage besides NACL](./assets/security-groups.png)
+
+## Security group VS NACL
+
+|                     | Security Group                                                                                       | NACL                                                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Works at            | EC2 instance level.                                                                                  | Subnet level.                                                                                                                   |
+| Supports            | ALLOW rules.                                                                                         | ALLOW/DENY rules.                                                                                                               |
+| Connection tracking | Stateful: they automatically allow return traffic that corresponds to an allowed inbound connection. | Stateless: they do not track the state of connections, thus explicit rules for both inbound and outbound traffic are necessary. |
+| Configuring it      | You must explicitly say it.                                                                          | It is automatically applied (Each instance is within a subnet).                                                                 |
 
 \-[ref](https://www.youtube.com/watch?v=2doSoMN2xvI)
 
