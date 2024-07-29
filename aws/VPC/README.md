@@ -28,6 +28,12 @@
 
 - You can assign an EIP[^1] to your EC2 instance.
 - Linked to a region.
+- VPC peering connection:
+
+  - A networking connection between two VPCs that enables you to route traffic between them privately.
+  - Crosses regions/accounts.
+
+  ![VPC peering](./assets/vpc-peering.webp)
 
 > [!IMPORTANT]
 >
@@ -153,6 +159,18 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 | Supports            | ALLOW rules.                                                                                         | ALLOW/DENY rules.                                                                                                               |
 | Connection tracking | Stateful: they automatically allow return traffic that corresponds to an allowed inbound connection. | Stateless: they do not track the state of connections, thus explicit rules for both inbound and outbound traffic are necessary. |
 | Configuring it      | You must explicitly say it.                                                                          | It is automatically applied (Each instance is within a subnet).                                                                 |
+
+# VPC flow logs
+
+- Log <span style="text-decoration: underline dotted; text-underline-offset: 0.1em; cursor: help;" title="Things like VPC, subnets, Elastic network interface.">network</span> traffics.
+  - It is not limited to EC2 instances and your RESTful APIs essentially.
+  - Can be AWS managed services such as: RDS, Aurora, ElastiCache, Elastic load balancer, etc.
+  - Store them in S3, CloudWatch logs, Kinesis data firehouse.
+- Identify patterns, threats, and risks across your VPC network.
+
+![VPC flow logs](./assets/vpc-flow-logs.png)
+
+# References
 
 \-[ref](https://www.youtube.com/watch?v=2doSoMN2xvI)
 
