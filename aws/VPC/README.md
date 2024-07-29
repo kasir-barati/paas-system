@@ -22,13 +22,18 @@
 
     So we use variable length subnet masking (VLSM) to return the value of a network address, from the IP address, by turning the host address into zeroes. In other words we are breaking down an IP address space into subnets of various sizes.
 
+  - You can check the range of IP that you'll get by going to [CIDR.xyz](https://cidr.xyz/).
+
   But if these explanations are too hard to understand right away I guess you could also interpret the _subnet mask_ as an indicator that determines which part of the Network ID should change.
+
+- You can assign an EIP[^1] to your EC2 instance.
+- Linked to a region.
 
 > [!IMPORTANT]
 >
 > By clicking on "Create VPC" you're gonna create a new VPC which is not the default VPC. If you've deleted your default VPC you need to create a new default VPC by clicking on "Create default VPC" in "Actions"\* dropdown.
 >
-> Un check all the selected VPCs in the VPC's table to see "Create default VPC" option.
+> Uncheck all the selected VPCs in the VPC's table to see "Create default VPC" option.
 >
 > ![Create default VPC](./assets/create-default-vpc.png)
 
@@ -40,21 +45,33 @@
 | Cannot combine networks of different classes             | Can combine networks of different classes                                 |
 | Less efficient since all devices are in one huge network | route data packets to the respective device based on the indicated subnet |
 
+> [!TIP]
+>
+> AWS **charges you** for every single **public IPv4** you're using. **BUT** you can use **IPv6** instead which is **free**. JFI: all IPv6 are public.
+
 # Subnet
 
 Next stop after creating VPC is to create subnets.
 
+- We will use subnets to partition our VPC.
 - It is a defined set of IP addresses.
 - They can be public or private.
+
   - We usually create 2 for each, placed in different AZs (for hight-availability).
   - And you might wanna have more private IP addresses.
+
+  ![Subnets](./assets/subnet.png)
+
 - Each subnet must be:
   1. Associated to a VPC.
   2. In an AZ.
   3. With a specific non conflicting CIDR.
 
+![Cross AZs VPC](./assets/cross-availability-zones-vpc.png)
+
 ## NACL
 
+- AKA Network ACL.
 - Stands for Network Access Control List.
 - Virtual firewall around subnets.
 - Stateless: You need to define outbound rules to let requests out (implying that you do not have access to outside world unless you explicitly define it).
@@ -65,7 +82,7 @@ Next stop after creating VPC is to create subnets.
 Next step is enabling our EC2 instance to connect to the internet.
 
 - Subnets need to know how they can connect to other networks (route to it).
-  - E.g. Internet access.
+  - E.g. Internet, another subnet, etc.
 - Each route table belongs to one VPC.
   - After creating a subnet we need to explicitly associate it to a subnet.
 - By default when you create a new VPC AWS creates a main default route table for us.
@@ -81,6 +98,9 @@ Next step is enabling our EC2 instance to connect to the internet.
 ## Internet gateway
 
 - It's a special gateway. As its name implies it connects our VPC to the internet.
+
+  ![Internet gateway infographic](./assets/internet-gateway.png)
+
 - How it works:
   1. Create a new internet gateway.
   2. We attach it to our VPC.
@@ -92,18 +112,25 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 
 ### NAT gateway
 
+- Manged by AWS.
 - Stands for Network Address Translation.
 - EC2 instances who are placed in a private _subnet_ need to access internet.
   > [!NOTE]
   >
   > They are not publicly accessible. But they can and need to have access to the internet.
 - So we create a NAT gateway in a public subnet and route private subnet requests to it.
-- It needs an EIP (Elastic IP) to work.
+- It needs an EIP[^1] to work.
   - EIP must match the network border group of the AZ that you're launching the public NAT gateway into. You can see the network border group for the subnet's AZ by viewing the details of the subnet.
+
+![NAT gateway](./assets/nat-gateway.png)
 
 > [!NOTE]
 >
 > After you've created the NAT gateway you still need to add it as a route to your private subnet.
+
+> [!TIP]
+>
+> NAT instance: we can run a self-managed version of NAT.
 
 # Security Group
 
@@ -112,3 +139,7 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 - Stateful
 
 \-[ref](https://www.youtube.com/watch?v=2doSoMN2xvI)
+
+# Footnotes
+
+[^1]: Elastic IP. A fixed public IP dedicated to our EC2 instance or NAT gateway.
