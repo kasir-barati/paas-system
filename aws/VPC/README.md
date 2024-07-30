@@ -190,6 +190,34 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 
   ![PrivateLink](./assets/PrivateLink.png)
 
+# VPN
+
+- Hybrid cloud.
+- You wanna connect your on-premises data center to your AWS VPC.
+
+  - Options we've got:
+
+    1. Site to site VPN:
+
+       - It is an encrypted connection between these two parties over the internet.
+       - In less than 5 minutes you can run.
+       - In your on-premise data center you need a "customer gateway (CGW)"
+       - And in AWS we need "virtual private gateway (VPG)".
+
+       ![Site to site VPC](./assets/s2s-vpn.png)
+
+    2. Direct connect(DX):
+
+       - A real physical connection between on-premise data center and AWS.
+       - Needs at least one month to establish it.
+
+       ![Direct connect](./assets/dx.png)
+
+  - | These two question can help you to pic one |
+    | ------------------------------------------ |
+    | how urgent do we need it?                  |
+    | does it need to be 100% private?           |
+
 # References
 
 \-[ref](https://www.youtube.com/watch?v=2doSoMN2xvI)
