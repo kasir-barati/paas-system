@@ -160,7 +160,7 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 | Connection tracking | Stateful: they automatically allow return traffic that corresponds to an allowed inbound connection. | Stateless: they do not track the state of connections, thus explicit rules for both inbound and outbound traffic are necessary. |
 | Configuring it      | You must explicitly say it.                                                                          | It is automatically applied (Each instance is within a subnet).                                                                 |
 
-# VPC flow logs
+# VPC flow logs feature
 
 - Log <span style="text-decoration: underline dotted; text-underline-offset: 0.1em; cursor: help;" title="Things like VPC, subnets, Elastic network interface.">network</span> traffics.
   - It is not limited to EC2 instances and your RESTful APIs essentially.
@@ -169,6 +169,26 @@ So now your EC2 instances who are within the public subnet must be reachable thr
 - Identify patterns, threats, and risks across your VPC network.
 
 ![VPC flow logs](./assets/vpc-flow-logs.png)
+
+# VPC endpoints feature
+
+- Connect to AWS using a private network (AWS's network).
+- Lower latency.
+- Enhanced security.
+
+| Type      | AWS service          | Infographic                                                            |
+| --------- | -------------------- | ---------------------------------------------------------------------- |
+| Gateway   | S3.<br/>DynamoDB.    | ![VPC endpoints of type gateway](./assets/vpc-endpoint-gateway.png)    |
+| Interface | Rest of AWS services | ![VPC endpoints of type interface](./assets/vpc-interface-network.png) |
+
+- Create a VPC endpoint of type .
+
+# PrivateLink
+
+- Connect a service to another service without <table style="display:inline"><tr><td>VPC peering</td></tr><tr><td>Internet gateway</td></tr><tr><td>NAT</td></tr><tr><td>route table</td></tr></table>, instead you'll connect directly & privately.
+- On the consumer's side we need an Elastic Network Interface (ENI) and on the service provider's side an Network Load Balancer.
+
+  ![PrivateLink](./assets/PrivateLink.png)
 
 # References
 
