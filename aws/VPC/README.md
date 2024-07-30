@@ -218,6 +218,12 @@ So now your EC2 instances who are within the public subnet must be reachable thr
     | how urgent do we need it?                  |
     | does it need to be 100% private?           |
 
+# Client VPN
+
+- Connect to your VPC privately with OpenVPN.
+
+![OpenVPN client](./assets/openvpn.png)
+
 # References
 
 \-[ref](https://www.youtube.com/watch?v=2doSoMN2xvI)
