@@ -1,3 +1,7 @@
+# Handwritings
+
+I first started by jotting down on a paper what I was learning about AWS but then I change my mind and decided to document it in a more accessible way. That's the back story behind this exhaustive doc. But you can always find my handwriting [here](./aws/handwritings/README.md).
+
 # Content
 
 - [CloudFront](./aws/CloudFront/README.md)
